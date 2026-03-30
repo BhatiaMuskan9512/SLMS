@@ -140,24 +140,27 @@ import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 
 // --- Educator Management Pages (Private) ---
-//import EDashboard from './pages/educator/Dashboard';
+
 import Courses from './pages/educator/Courses'; 
 import CreateCourse from './pages/educator/CreateCourse';
 import EditCourse from './pages/educator/EditCourse';
 import CreateLecture from './pages/educator/CreateLecture';
 import EditLecture from './pages/educator/EditLecture';
 
-//  import SDashboard from './pages/student/SDashboard';
+import EDashboard from './pages/educator/Dashboard';
+import SDashboard from './pages/student/Dashboard';
+
 import Process from './pages/process';
 
 // --- Redux Actions ---
 import { setUser, setIsAuthenticated, setLoading } from './redux/authSlice';
 import { FaDashcube } from 'react-icons/fa';
-import Dashboard from './pages/student/Dashboard';
+
 
 const App = () => {
     const dispatch = useDispatch();
     const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
+    // const {user, isAuthenticated} = useSelector((state) => state.auth);
 
     // 1. Persist Login Check (withCredentials logic is crucial here)
     useEffect(() => {
@@ -197,11 +200,25 @@ const App = () => {
             
             <Navbar />
            
-            <main className="min-h-screen">
+            <main className=" pt-[80px] min-h-screen">
+               
                 <Routes>
+                    
                     {/* --- Public Routes --- */}
-                    <Route path="/" element={<Home />} />
-                    <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
+                    <Route path="/" 
+                        element={ isAuthenticated ? (
+                        user?.role === 'student' ? 
+                        <Navigate to="/student/dashboard" /> 
+                        : <Navigate to="/educator/dashboard"/>): <Home />} />
+                    <Route path="/login"
+                        element={isAuthenticated  ? (
+                             user?.role === 'student' ? 
+                             <Navigate to="/student/dashboard" /> 
+                        : <Navigate to="/educator/dashboard"/>): <Login />} />
+                   
+                    <Route path="/student/dashboard" element={<SDashboard />} />
+                    <Route path="/educator/dashboard" element={<EDashboard />} />
+                    
                     <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/" />} />
                     <Route path="/forget-password" element={<ForgetPassword />} />
                     <Route path="/verify-otp" element={<VerifyOTP />} />
@@ -218,13 +235,14 @@ const App = () => {
                     <Route path="/my-profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
                     <Route path="/edit-profile" element={isAuthenticated ? <EditProfile /> : <Navigate to="/login" />} />
                     
-                    <Route path="/student/dashboard" element={<Dashboard />} />
+                   
                     {/* <Route path="/dashboard" element={<Dashboard/>} /> */}
 
                     {/* --- Educator Management Routes (Protected & Role Required) --- */}
-                    {/* <Route path="/educator/dashboard" element={user?.role === 'educator' ? <EDashboard /> : <Navigate to="/" />} /> */}
+                   
+                   
                     
-                    <Route path="/educator/courses" element={user?.role === 'educator' ? <Courses /> : <Navigate to="/" />} />
+                    <Route path="/educator/courses" element={user?.role === 'educator' ? <Courses /> : <Navigate to="/login" />} />
                     <Route path="/educator/create-course" element={user?.role === 'educator' ? <CreateCourse /> : <Navigate to="/" />} />
                     <Route path="/educator/edit-course/:courseId" element={user?.role === 'educator' ? <EditCourse /> : <Navigate to="/" />} />
                     <Route path="/educator/create-lecture/:courseId" element={user?.role === 'educator' ? <CreateLecture /> : <Navigate to="/" />} />

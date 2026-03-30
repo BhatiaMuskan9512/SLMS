@@ -81,6 +81,7 @@ const EditCourse = () => {
     return (
         <div className="p-4 sm:p-8 bg-gray-50 min-h-screen">
             {/* --- Header --- */}
+          
             <div className="max-w-5xl mx-auto mb-8 flex justify-between items-center">
                 <button onClick={() => navigate('/educator/courses')} className="flex items-center gap-2 text-gray-500 hover:text-black">
                     <BiArrowBack /> Back
@@ -128,7 +129,7 @@ const EditCourse = () => {
                                 </div>
                             </div>
 
-                            {/* Thumbnail Preview & Upload */}
+                            {/* Thumbnail Preview & Upload
                             <div>
                                 <label className="block text-sm font-bold mb-2">Course Thumbnail</label>
                                 <div className="flex items-center gap-4">
@@ -142,7 +143,7 @@ const EditCourse = () => {
                                         <input type="file" hidden onChange={(e) => setThumbnail(e.target.files[0])} />
                                     </label>
                                 </div>
-                            </div>
+                            </div> */}
 
                             <button 
                                 type="submit" 
@@ -168,7 +169,7 @@ const EditCourse = () => {
                     </div>
 
                     <div className="space-y-3">
-                        {lectures.map((lec, index) => (
+                        {/* {lectures?.map((lec, index) => (
                             <div key={lec._id} className="p-3 border rounded-xl flex items-center justify-between hover:bg-gray-50 group">
                                 <div className="flex items-center gap-3">
                                     <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center text-xs font-bold">
@@ -192,7 +193,7 @@ const EditCourse = () => {
                                     </button>
                                 </div>
                             </div>
-                        ))}
+                        ))} */}
                     </div>
                 </div>
 

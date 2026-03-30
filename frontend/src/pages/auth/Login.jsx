@@ -131,7 +131,7 @@ const Login = () => {
                             loading ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800"
                         }`}
                     >
-                        {loading ? <BiLoaderAlt className="animate-spin text-xl" /> : "Sign In"}
+                        {loading ? <BiLoaderAlt className="animate-spin text-xl" /> : "Log In"}
                     </button>
                 </form>
 
