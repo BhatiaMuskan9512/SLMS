@@ -1,59 +1,47 @@
 /* WRAPPER */
 .db-wrap {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    height: 100vh;
-    background-color: #050505; /* Main page bg (optional) */
+    width: 280px;
+    flex-shrink: 0;
 }
 
 /* SIDEBAR CONTAINER */
+/* SIDEBAR CONTAINER UPDATE */
 .db-sidebar {
     width: 280px;
     min-width: 280px;
-    background: #0a0b0f; /* Dark theme background */
+    background: #0a0b0f; /* Dark theme */
     display: flex;
     flex-direction: column;
     height: 100vh;
     border-right: 1px solid rgba(255, 255, 255, 0.05);
-    position: relative;
+    position: fixed; /* Side mein chipka rahega */
+    left: 0;
+    top: 0;
     z-index: 1000;
-    overflow: hidden;
+    overflow-y: auto;
 }
 
 /* LOGO */
 .db-logo {
-    font-family: 'Cormorant Garamond', serif; /* Apne hisaab se font adjust karein */
-    font-size: 32px;
-    font-weight: 700;
-    color: #ffffff;
+    padding: 30px;
+    font-size: 28px;
+    font-weight: 800;
+    color: #ffffff; /* Skill remains White */
+    letter-spacing: -1.5px;
     display: flex;
     align-items: center;
-    justify-content: center; /* Center align for EduNova */
-    height: 85px;
-    min-height: 85px;
-    width: 100%;
-    background: #0a0b0f;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-    margin: 0;
-    flex-shrink: 0;
-    box-sizing: border-box;
+    border-b: 1px solid rgba(255, 255, 255, 0.03); 
 }
 
 .brand-yellow {
-    color: #d4a843; /* Yellow specific color */
+    color: #d4a843; /* Exact theme yellow */
+    font-weight: 800;
 }
 
 /* NAVIGATION AREA */
 .db-nav {
-    display: flex;
-    flex-direction: column;
-    padding: 15px 0;
-    margin: 0;
-    flex: 1; /* Logo ke baad bachi hui jagah cover karega */
-    overflow-y: auto;
-    overflow-x: hidden;
-    width: 100%;
+    flex: 1;
+    padding: 20px 0;
 }
 
 /* Custom Scrollbar hide karne ke liye (Optional) */
@@ -67,50 +55,49 @@
 
 /* NAV SECTION TITLES (LEARN, ACCOUNT) */
 .db-nav-section {
-    font-size: 11px;
-    letter-spacing: 1.5px;
+    padding: 15px 30px 5px;
+    font-size: 10px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.3);
     text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.4);
-    padding: 24px 24px 8px 30px;
-    font-weight: 600;
-    width: 100%;
-    box-sizing: border-box;
-    flex-shrink: 0;
+    tracking-widest: 1.5px;
 }
 
 /* INDIVIDUAL NAV ITEM */
 .db-nav-item {
+    padding: 12px 30px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    gap: 12px;
-    padding: 12px 24px 12px 30px;
-    font-size: 15px;
-    color: rgba(255, 255, 255, 0.7);
-    text-decoration: none;
+    gap: 15px;
     cursor: pointer;
-    width: 100%;
+    transition: all 0.2s;
     border-left: 3px solid transparent;
-    box-sizing: border-box;
-    transition: all 0.2s ease-in-out;
 }
 
 /* HOVER EFFECT */
 .db-nav-item:hover {
-    background: rgba(255, 255, 255, 0.05);
     color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.03);
 }
 
 /* ACTIVE STATE (YELLOW THEME) */
 .db-nav-item.active {
-    color: #d4a843;
-    background: rgba(212, 168, 67, 0.1);
-    border-left: 3px solid #d4a843;
-    font-weight: 500;
+    color: #d4a843; /* Yellow Theme for active tab */
+    background-color: rgba(212, 168, 67, 0.08); /* Yellow glow */
+    border-left-color: #d4a843;
+    font-weight: 600;
 }
 
 .ni {
-    font-size: 18px; /* Emoji/Icon size adjust karne ke liye */
+    font-size: 18px;
+    opacity: 0.8;
+   }
+
+   .db-nav-item.active .ni {
+    opacity: 1;
+    color: #d4a843;
 }
 
 /* SIDEBAR FOOTER */

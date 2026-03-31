@@ -111,10 +111,12 @@
 // export default App;
 
 import React, { useEffect } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+// 🌟 FIX: Saare router imports ek hi line mein kar diye (useLocation ke sath)
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { Toaster } from 'react-hot-toast';
+import { FaDashcube } from 'react-icons/fa';
 
 // --- Components & Layouts ---
 import Navbar from './components/Navbar';
@@ -131,7 +133,6 @@ import ResetPassword from './pages/auth/ResetPassword';
 // --- Course Explorer Pages ---
 import AllCourses from './pages/AllCourses'; 
 import CourseDetail from './pages/CourseDetail';
-// import SearchWithAI from './pages/SearchWithAI';
 
 // --- Student Pages (Private) ---
 import MyEnrolledCourses from './pages/MyEnrolledCourses';
@@ -140,7 +141,6 @@ import Profile from './pages/Profile';
 import EditProfile from './pages/EditProfile';
 
 // --- Educator Management Pages (Private) ---
-
 import Courses from './pages/educator/Courses'; 
 import CreateCourse from './pages/educator/CreateCourse';
 import EditCourse from './pages/educator/EditCourse';
@@ -155,36 +155,51 @@ import Process from './pages/process';
 
 // --- Redux Actions ---
 import { setUser, setIsAuthenticated, setLoading } from './redux/authSlice';
-import { FaDashcube } from 'react-icons/fa';
 
+// 🌟 SMART FOOTER LOGIC
+const SmartFooter = () => {
+  const location = useLocation();
+  
+  // 🚫 In URLs par Footer NAHI dikhana hai
+  const hideFooterRoutes = [
+    '/student/dashboard', 
+    '/my-courses', 
+    '/course-player',
+    '/my-profile'
+  ];
+
+  const shouldHide = hideFooterRoutes.some(route => location.pathname.includes(route));
+
+  if (shouldHide) {
+    return null; 
+  }
+
+  return <Footer />; 
+};
 
 const App = () => {
     const dispatch = useDispatch();
     const { user, isAuthenticated, loading } = useSelector((state) => state.auth);
-    // const {user, isAuthenticated} = useSelector((state) => state.auth);
 
-    // 1. Persist Login Check (withCredentials logic is crucial here)
+    // 1. Persist Login Check
     useEffect(() => {
         const checkUser = async () => {
             try {
-                // Pointing to backend's profile endpoint
                 const res = await axios.get("http://localhost:8000/api/user/get-current-user", { withCredentials: true });
                 if (res.data.success) {
                     dispatch(setUser(res.data.user));
                     dispatch(setIsAuthenticated(true));
                 }
             } catch (error) {
-                // Silently fails if user is not logged in, standard procedure
                 dispatch(setIsAuthenticated(false));
             } finally {
-                // Ensure loading spinner stops
                 dispatch(setLoading(false));
             }
         };
         checkUser();
     }, [dispatch]);
 
-    // 2. Premium Loading Spinner (UX matched to tutorial)
+    // 2. Loading Spinner
     if (loading) return (
         <div className="h-screen flex items-center justify-center bg-white font-jakarta">
             <div className="text-center">
@@ -194,18 +209,14 @@ const App = () => {
         </div>
     );
     
-
     return (
         <BrowserRouter>
-            {/* Standard React Hot Toast container */}
             <Toaster position="top-center" reverseOrder={false} />
             
             <Navbar />
            
-            <main className=" pt-[80px] min-h-screen">
-               
+            <main className="pt-[80px] min-h-screen">
                 <Routes>
-                    
                     {/* --- Public Routes --- */}
                     <Route path="/" 
                         element={ isAuthenticated ? (
@@ -229,7 +240,6 @@ const App = () => {
                     {/* --- Course Explorer Routes --- */}
                     <Route path="/all-courses" element={<AllCourses />} />
                     <Route path="/course-detail/:courseId" element={<CourseDetail />} />
-                    {/* <Route path="/search-ai" element={<SearchWithAI />} /> */}
 
                     {/* --- Student Routes (Authentication Required) --- */}
                     <Route path="/my-courses" element={isAuthenticated ? <MyEnrolledCourses /> : <Navigate to="/login" />} />
@@ -237,14 +247,10 @@ const App = () => {
                     <Route path="/course-player/:courseId" element={isAuthenticated ? <CoursePlayer /> : <Navigate to="/login" />} />
                     <Route path="/my-profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
                     <Route path="/edit-profile" element={isAuthenticated ? <EditProfile /> : <Navigate to="/login" />} />
-                    
-                   
-                    {/* <Route path="/dashboard" element={<Dashboard/>} /> */}
+                    <Route path="/student/progress" element={isAuthenticated ? <div className="p-10 ml-[280px]">Progress Page Coming Soon</div> : <Navigate to="/login" />} />
+                    <Route path="/student/settings" element={isAuthenticated ? <div className="p-10 ml-[280px]">Settings Page Coming Soon</div> : <Navigate to="/login" />} />
 
-                    {/* --- Educator Management Routes (Protected & Role Required) --- */}
-                   
-                   
-                    
+                    {/* --- Educator Management Routes --- */}
                     <Route path="/educator/courses" element={user?.role === 'educator' ? <Courses /> : <Navigate to="/login" />} />
                     <Route path="/educator/create-course" element={user?.role === 'educator' ? <CreateCourse /> : <Navigate to="/" />} />
                     <Route path="/educator/edit-course/:courseId" element={user?.role === 'educator' ? <EditCourse /> : <Navigate to="/" />} />
@@ -252,10 +258,10 @@ const App = () => {
                     <Route path="/educator/edit-lecture/:lectureId" element={user?.role === 'educator' ? <EditLecture /> : <Navigate to="/" />} />
 
                 </Routes>
-              
             </main>
               
-            <Footer />
+           {/* 🌟 Smart Footer */}
+           <SmartFooter />
         </BrowserRouter>
     );
 };
