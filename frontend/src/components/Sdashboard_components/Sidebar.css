@@ -1,0 +1,120 @@
+/* WRAPPER */
+.db-wrap {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100vh;
+    background-color: #050505; /* Main page bg (optional) */
+}
+
+/* SIDEBAR CONTAINER */
+.db-sidebar {
+    width: 280px;
+    min-width: 280px;
+    background: #0a0b0f; /* Dark theme background */
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+/* LOGO */
+.db-logo {
+    font-family: 'Cormorant Garamond', serif; /* Apne hisaab se font adjust karein */
+    font-size: 32px;
+    font-weight: 700;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Center align for EduNova */
+    height: 85px;
+    min-height: 85px;
+    width: 100%;
+    background: #0a0b0f;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+    margin: 0;
+    flex-shrink: 0;
+    box-sizing: border-box;
+}
+
+.brand-yellow {
+    color: #d4a843; /* Yellow specific color */
+}
+
+/* NAVIGATION AREA */
+.db-nav {
+    display: flex;
+    flex-direction: column;
+    padding: 15px 0;
+    margin: 0;
+    flex: 1; /* Logo ke baad bachi hui jagah cover karega */
+    overflow-y: auto;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Custom Scrollbar hide karne ke liye (Optional) */
+.db-nav::-webkit-scrollbar {
+    width: 5px;
+}
+.db-nav::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+/* NAV SECTION TITLES (LEARN, ACCOUNT) */
+.db-nav-section {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.4);
+    padding: 24px 24px 8px 30px;
+    font-weight: 600;
+    width: 100%;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+/* INDIVIDUAL NAV ITEM */
+.db-nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 12px 24px 12px 30px;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    cursor: pointer;
+    width: 100%;
+    border-left: 3px solid transparent;
+    box-sizing: border-box;
+    transition: all 0.2s ease-in-out;
+}
+
+/* HOVER EFFECT */
+.db-nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+}
+
+/* ACTIVE STATE (YELLOW THEME) */
+.db-nav-item.active {
+    color: #d4a843;
+    background: rgba(212, 168, 67, 0.1);
+    border-left: 3px solid #d4a843;
+    font-weight: 500;
+}
+
+.ni {
+    font-size: 18px; /* Emoji/Icon size adjust karne ke liye */
+}
+
+/* SIDEBAR FOOTER */
+.db-sidebar-foot {
+    padding: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
