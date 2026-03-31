@@ -169,9 +169,37 @@ export const getCourseLectures = async (req, res) => {
 };
 
 // 9. Edit lecture and upload Video
+// export const editLecture = async (req, res) => {
+//     const { lectureId } = req.params;
+//     const { lectureTitle, isPreviewFree } = req.body;
+
+//     try {
+//         let lecture = await Lecture.findById(lectureId);
+//         if (!lecture) {
+//             return res.status(404).json({ message: "Lecture not found" });
+//         }
+
+//         if (req.file) {
+//             const uploadResult = await uploadOnCloudinary(req.file.path);
+//             lecture.videoUrl = uploadResult?.secure_url;
+//         }
+
+//         if (lectureTitle) lecture.lectureTitle = lectureTitle;
+//         if (isPreviewFree !== undefined) lecture.isPreviewFree = isPreviewFree;
+
+//         await lecture.save();
+
+//         return res.status(200).json(lecture);
+//     } catch (error) {
+//         return res.status(500).json({ message: `Failed to edit lecture: ${error.message}` });
+//     }
+// };
+// backend/controllers/courseController.js mein editLecture function:
+
 export const editLecture = async (req, res) => {
     const { lectureId } = req.params;
-    const { lectureTitle, isPreviewFree } = req.body;
+    // Hum body se lectureTitle aur videoUrl (link) dono le rahe hain
+    const { lectureTitle, isPreviewFree, videoUrl } = req.body;
 
     try {
         let lecture = await Lecture.findById(lectureId);
@@ -179,9 +207,14 @@ export const editLecture = async (req, res) => {
             return res.status(404).json({ message: "Lecture not found" });
         }
 
+        // 1. Agar koi file upload hui hai (Cloudinary), toh URL update karein
         if (req.file) {
             const uploadResult = await uploadOnCloudinary(req.file.path);
             lecture.videoUrl = uploadResult?.secure_url;
+        } 
+        // 2. Agar file nahi hai par direct LINK (videoUrl) bheja hai, toh usey save karein
+        else if (videoUrl) {
+            lecture.videoUrl = videoUrl;
         }
 
         if (lectureTitle) lecture.lectureTitle = lectureTitle;
@@ -194,6 +227,7 @@ export const editLecture = async (req, res) => {
         return res.status(500).json({ message: `Failed to edit lecture: ${error.message}` });
     }
 };
+
 
 // 10. Remove a lecture from a course and DB
 export const removeLecture = async (req, res) => {

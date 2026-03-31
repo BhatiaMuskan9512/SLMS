@@ -4,152 +4,112 @@ import React, { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { BiArrowBack, BiCloudUpload, BiCheckCircle, BiLoaderAlt } from "react-icons/bi";
+import { BiArrowBack, BiLink, BiLoaderAlt, BiMoviePlay } from "react-icons/bi";
 
 const EditLecture = () => {
     const navigate = useNavigate();
-    const { lectureId } = useParams(); // Get lecture ID from the URL
+    const { lectureId } = useParams();
 
-    // --- States ---
     const [title, setTitle] = useState("");
-    const [video, setVideo] = useState(null);
+    const [videoLink, setVideoLink] = useState(""); // Ab hum sirf string (link) save karenge
     const [loading, setLoading] = useState(false);
+    const [fetching, setFetching] = useState(true);
 
-    // --- Form Submission Logic ---
+    useEffect(() => {
+        const fetchLecture = async () => {
+            try {
+                const res = await axios.get(`http://localhost:8000/api/course/get-lecture/${lectureId}`, { withCredentials: true });
+                setTitle(res.data.lectureTitle || "");
+                setVideoLink(res.data.videoUrl || ""); // Purana link fetch karein
+            } catch (error) {
+                console.error("Fetch error:", error);
+            } finally {
+                setFetching(false);
+            }
+        };
+        fetchLecture();
+    }, [lectureId]);
+
     const handleUpdateLecture = async (e) => {
         e.preventDefault();
-        
-        // Validation: Title is required
         if (!title.trim()) return toast.error("Please enter a lecture title");
+        if (!videoLink.trim()) return toast.error("Please provide a video link");
 
         setLoading(true);
 
-        // We use FormData because we are uploading a physical file (video)
-        const formData = new FormData();
-        formData.append("title", title);
-        if (video) {
-            formData.append("videoUrl", video); // Key must match backend upload.single("videoUrl")
-        }
-
         try {
+            // Ab hum FormData ki jagah simple JSON bhej rahe hain kyunki file nahi hai
             const response = await axios.post(
                 `http://localhost:8000/api/course/edit-lecture/${lectureId}`, 
-                formData, 
                 { 
-                    withCredentials: true,
-                    headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
-                }
+                    lectureTitle: title, 
+                    videoUrl: videoLink // Direct link bhej rahe hain
+                }, 
+                { withCredentials: true }
             );
 
             if (response.data) {
-                toast.success("Lecture updated successfully!");
-                // Navigate back to the previous page (the course editing area)
-                navigate(-1); 
+                toast.success("Lecture link updated!");
+                navigate(-1);
             }
         } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to upload video");
+            toast.error(error.response?.data?.message || "Failed to update");
         } finally {
             setLoading(false);
         }
     };
 
+    if (fetching) return <div className="p-20 text-center font-bold text-slate-400">Loading...</div>;
+
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-5">
-            
-            {/* --- Header / Back Button --- */}
-            <div className="w-full max-w-[600px] mb-6">
-                <button 
-                    onClick={() => navigate(-1)} 
-                    className="flex items-center gap-2 text-gray-500 hover:text-black transition-all"
-                >
-                    <BiArrowBack /> Back to Course Editing
+        <div className="min-h-screen bg-[#f8fafc] flex flex-col items-center justify-center p-6">
+            <div className="w-full max-w-[550px] mb-6">
+                <button onClick={() => navigate(-1)} className="flex items-center gap-2 text-slate-500 hover:text-[#c5a358] font-bold transition-all">
+                    <BiArrowBack size={20}/> Back
                 </button>
             </div>
 
-            {/* --- Main Card --- */}
-            <div className="w-full max-w-[600px] bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-12">
-                <div className="flex flex-col items-center mb-8 text-center">
-                    <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-3xl mb-4">
-                        <BiCloudUpload />
+            <div className="w-full max-w-[550px] bg-white rounded-[2.5rem] shadow-xl p-10 border border-slate-100">
+                <div className="flex flex-col items-center mb-10 text-center">
+                    <div className="w-20 h-20 bg-blue-50 text-blue-500 rounded-[1.5rem] flex items-center justify-center text-4xl mb-5">
+                        <BiMoviePlay />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-800">Edit Lecture Content</h1>
-                    <p className="text-sm text-gray-400 mt-2">
-                        Update the title and upload the video file for this lesson.
-                    </p>
+                    <h1 className="text-3xl font-black text-[#1e293b]">Lecture Link</h1>
+                    <p className="text-slate-400 mt-2 font-medium text-sm">Paste a video URL (YouTube/Cloudinary) to update this lesson.</p>
                 </div>
 
-                <form onSubmit={handleUpdateLecture} className="space-y-6">
-                    {/* Lecture Title */}
-                    <div className="space-y-2">
-                        <label className="text-sm font-semibold text-gray-700">Lecture Title</label>
+                <form onSubmit={handleUpdateLecture} className="space-y-8">
+                    <div className="space-y-3">
+                        <label className="text-xs font-black uppercase text-slate-400 ml-1">Lecture Title</label>
                         <input 
                             type="text" 
-                            placeholder="Change lecture name..."
-                            className="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-blue-500 transition-all"
+                            className="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none focus:border-blue-500 transition-all font-bold"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            required
                         />
                     </div>
 
-                    {/* Video Upload Area */}
-                    <div className="space-y-2">
-                        <label className="text-sm font-semibold text-gray-700">Video File (.mp4, .mov, etc.)</label>
-                        <div className="relative group">
+                    <div className="space-y-3">
+                        <label className="text-xs font-black uppercase text-slate-400 ml-1">Video URL / Link</label>
+                        <div className="relative">
+                            <BiLink className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-xl" />
                             <input 
-                                type="file" 
-                                accept="video/*"
-                                className="hidden" 
-                                id="video-upload"
-                                onChange={(e) => setVideo(e.target.files[0])}
+                                type="text" 
+                                placeholder="https://example.com/video.mp4"
+                                className="w-full pl-12 pr-5 py-4 rounded-2xl bg-slate-50 border border-slate-100 outline-none focus:border-blue-500 transition-all font-medium text-blue-600"
+                                value={videoLink}
+                                onChange={(e) => setVideoLink(e.target.value)}
                             />
-                            <label 
-                                htmlFor="video-upload"
-                                className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-2xl cursor-pointer transition-all ${
-                                    video ? "border-green-400 bg-green-50" : "border-gray-200 hover:border-blue-400 bg-gray-50"
-                                }`}
-                            >
-                                {video ? (
-                                    <div className="flex flex-col items-center text-green-600">
-                                        <BiCheckCircle className="text-4xl mb-2" />
-                                        <span className="text-sm font-medium">{video.name}</span>
-                                        <span className="text-[10px] uppercase mt-1">Ready to upload</span>
-                                    </div>
-                                ) : (
-                                    <div className="flex flex-col items-center text-gray-400">
-                                        <BiCloudUpload className="text-4xl mb-2 group-hover:text-blue-500" />
-                                        <span className="text-sm">Click to browse video files</span>
-                                    </div>
-                                )}
-                            </label>
                         </div>
                     </div>
 
-                    {/* Submit Button */}
                     <button 
                         type="submit"
                         disabled={loading}
-                        className={`w-full py-4 rounded-xl font-bold text-white transition-all shadow-lg flex items-center justify-center gap-3 ${
-                            loading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
-                        }`}
+                        className="w-full py-5 rounded-[1.5rem] font-black text-white bg-[#1e293b] hover:bg-slate-800 transition-all flex items-center justify-center gap-3 disabled:bg-slate-300"
                     >
-                        {loading ? (
-                            <>
-                                <BiLoaderAlt className="animate-spin text-xl" />
-                                Uploading to Cloudinary...
-                            </>
-                        ) : (
-                            "Update Lecture & Upload"
-                        )}
+                        {loading ? <BiLoaderAlt className="animate-spin text-2xl" /> : "Save Link"}
                     </button>
-                    
-                    {loading && (
-                        <p className="text-[11px] text-center text-gray-400 animate-pulse italic">
-                            Large videos may take a few minutes. Please don't close this tab.
-                        </p>
-                    )}
                 </form>
             </div>
         </div>
