@@ -50,7 +50,7 @@ courseRouter.post("/create-lecture/:courseId", isAuth, createLecture);
 courseRouter.get("/course-lecture/:courseId", isAuth, getCourseLectures);
 
 // Edit lecture and upload video file (Protected + Multer)
-courseRouter.post("/edit-lecture/:lectureId", isAuth, upload.single("videoUrl"), editLecture);
+courseRouter.post("/edit-lecture/:lectureId", isAuth, upload.single("video"), editLecture);
 
 // Delete a lecture (Protected)
 courseRouter.delete("/remove-lecture/:lectureId", isAuth, removeLecture);
