@@ -19,7 +19,7 @@ const CourseDetail = () => {
     useEffect(() => {
         const fetchCourse = async () => {
             try {
-                const res = await axios.get(`http://localhost:8000/api/course/get-course/${courseId}`);
+                const res = await axios.get(`http://localhost:8000/api/course/get-course/${courseId}`,{withCredentials: true});
                 dispatch(setSingleCourse(res.data));
             } catch (error) {
                 toast.error("Course not found");
