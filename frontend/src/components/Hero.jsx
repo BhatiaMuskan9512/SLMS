@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom'; // 1. useNavigate import karein
 
 const Hero = ({ setIsHovering }) => {
-  const navigate = useNavigate(); // 2. Hook ko initialize karein
-  
+  // Stats Counting Logic
   const [counts, setCounts] = useState({ learners: 0, courses: 0, rate: 0, countries: 0 });
 
   useEffect(() => {
     const targets = { learners: 50, courses: 800, rate: 98, countries: 120 };
-    const duration = 2000;
+    const duration = 2000; // 2 seconds mein count khatam hoga
     const frameDuration = 1000 / 60;
     const totalFrames = Math.round(duration / frameDuration);
 
@@ -32,19 +30,25 @@ const Hero = ({ setIsHovering }) => {
   return (
     <section className="relative min-h-screen flex items-center justify-center pt-32 pb-20 px-6 overflow-hidden bg-[#fdf8ef]">
       
-      {/* Background Elements... (Same as your code) */}
+      {/* 1. Animated Orbs (Floating Background) */}
       <div className="absolute top-[-100px] right-[-100px] w-[600px] h-[600px] rounded-full bg-radial-gradient from-[#d4a8432e] to-transparent animate-pulse pointer-events-none"></div>
       <div className="absolute bottom-[-80px] left-[-80px] w-[400px] h-[400px] rounded-full bg-radial-gradient from-[#3ecfc61f] to-transparent animate-bounce pointer-events-none" style={{animationDuration: '10s'}}></div>
+
+      {/* 2. Background Grid */}
       <div className="absolute inset-0 opacity-[0.06] pointer-events-none bg-[linear-gradient(rgba(212,168,67,1)_1px,transparent_1px),linear-gradient(90deg,rgba(212,168,67,1)_1px,transparent_1px)] bg-[size:60px_60px]"></div>
 
       <div className="relative z-10 max-w-4xl text-center">
         
         {/* Trusted Pill */}
-        <div className="animate-fade-up delay-100 inline-flex items-center gap-2 bg-[#d4a8431f] border border-[#d4a8434d] rounded-full px-4 py-1.5 text-[12.5px] font-semibold text-[#d4a843] mb-8 cursor-pointer hover:bg-[#d4a84333] transition-all">
+        <div 
+          onMouseEnter={() => setIsHovering(true)}
+          onMouseLeave={() => setIsHovering(false)}
+          className="animate-fade-up delay-100 inline-flex items-center gap-2 bg-[#d4a8431f] border border-[#d4a8434d] rounded-full px-4 py-1.5 text-[12.5px] font-semibold text-[#d4a843] mb-8 cursor-pointer hover:bg-[#d4a84333] transition-all"
+        >
           ★ Trusted by 50,000+ learners worldwide
         </div>
 
-        {/* Heading & Paragraph */}
+        {/* Heading */}
         <h1 className="animate-fade-up delay-200 font-cormorant text-[clamp(42px,7vw,88px)] font-light leading-[1.1] text-[#0a0b0f] mb-4">
           <span className="italic text-[#d4a843]">Transform</span> the Way<br />
           <strong className="font-bold">You Learn</strong> & Grow
@@ -54,23 +58,24 @@ const Hero = ({ setIsHovering }) => {
           An elegant, powerful learning platform designed for the modern learner. Master new skills with world-class instructors.
         </p>
 
-        {/* Actions - UPDATED BUTTON */}
+        {/* Actions */}
         <div className="animate-fade-up delay-400 flex flex-wrap items-center justify-center gap-4">
           <button 
             onMouseEnter={() => setIsHovering(true)}
             onMouseLeave={() => setIsHovering(false)}
-            onClick={() => navigate('/login')} // 3. Click par login page par bhejein
             className="px-10 py-4 bg-[#0a0b0f] text-[#e8c96d] rounded-xl font-semibold text-[15px] shadow-2xl shadow-[#d4a84366] hover:bg-[#d4a843] hover:text-[#0a0b0f] transition-all duration-300 transform hover:-translate-y-1"
           >
             Start Learning Free →
           </button>
-          
-          <button className="px-10 py-4 border border-black/20 rounded-xl font-medium text-[#0a0b0f] flex items-center gap-2 hover:bg-[#d4a8430d] hover:border-[#d4a843] transition-all">
+          <button 
+           
+            className="px-10 py-4 border border-black/20 rounded-xl font-medium text-[#0a0b0f] flex items-center gap-2 hover:bg-[#d4a8430d] hover:border-[#d4a843] transition-all"
+          >
             ▶ Watch Demo
           </button>
         </div>
 
-        {/* Social Proof & Stats... (Same as your code) */}
+        {/* Social Proof */}
         <div className="animate-fade-up delay-500 mt-14 flex flex-col items-center gap-4">
           <div className="flex items-center gap-4">
             <div className="flex -space-x-3">
@@ -85,6 +90,7 @@ const Hero = ({ setIsHovering }) => {
             </div>
           </div>
 
+          {/* Stats Bar */}
           <div className="flex flex-wrap gap-12 mt-10 justify-center border-t border-black/5 pt-10">
             <Stat num={counts.learners} label="K+ Learners" />
             <Stat num={counts.courses} label="Expert Courses" />
@@ -97,7 +103,7 @@ const Hero = ({ setIsHovering }) => {
   );
 };
 
-// Sub-components
+// Sub-components for cleaner code
 const Avatar = ({ letter, color }) => (
   <div className={`w-9 h-9 rounded-full border-2 border-[#fdf8ef] flex items-center justify-center text-white text-[12px] font-bold bg-gradient-to-br ${color}`}>
     {letter}
