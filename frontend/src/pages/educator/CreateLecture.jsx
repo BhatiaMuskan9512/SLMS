@@ -12,34 +12,64 @@ const CreateLecture = () => {
     const [loading, setLoading] = useState(false);
 
     // Form Submission Logic
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    // const handleSubmit = async (e) => {
+    //     e.preventDefault();
         
-        if (!title.trim()) {
-            return toast.error("Lecture title is required");
-        }
+    //     if (!title.trim()) {
+    //         return toast.error("Lecture title is required");
+    //     }
 
-        setLoading(true);
+    //     setLoading(true);
 
-        try {
-            // Call the backend route to create a lecture placeholder
-            const response = await axios.post(
-                `http://localhost:8000/api/course/create-lecture/${courseId}`, 
-                { title },
-                { withCredentials: true }
-            );
+    //     try {
+    //         // Call the backend route to create a lecture placeholder
+    //         const response = await axios.post(
+    //             `http://localhost:8000/api/course/create-lecture/${courseId}`, 
+    //             { title },
+    //             { withCredentials: true }
+    //         );
 
-            if (response.data) {
-                toast.success("Lecture created! Now upload the video.");
-                // Redirect back to the Edit Course page to manage the new lecture
-                navigate(`/educator/edit-course/${courseId}`);
+    //         if (response.data) {
+    //             toast.success("Lecture created! Now upload the video.");
+    //             // Redirect back to the Edit Course page to manage the new lecture
+    //             navigate(`/educator/edit-course/${courseId}`);
+    //         }
+    //     } catch (error) {
+    //         toast.error(error.response?.data?.message || "Failed to create lecture");
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+    // CreateLecture.jsx ke handleSubmit function ko aise update karein:
+// Form Submission Logic
+        const handleSubmit = async (e) => {
+            e.preventDefault();
+            
+            if (!title.trim()) {
+                return toast.error("Lecture title is required");
             }
-        } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to create lecture");
-        } finally {
-            setLoading(false);
-        }
-    };
+
+            setLoading(true);
+
+            try {
+                // CHANGE YAHAN HAI: title ki jagah lectureTitle bhejna hai
+                const response = await axios.post(
+                    `http://localhost:8000/api/course/create-lecture/${courseId}`, 
+                    { lectureTitle: title }, // <-- Yeh change zaroori hai
+                    { withCredentials: true }
+                );
+
+                if (response.data) {
+                    toast.success("Lecture created! Now upload the video.");
+                    navigate(`/educator/edit-course/${courseId}`);
+                }
+            } catch (error) {
+                // Backend se jo error message aa raha hai wahi toast mein dikhega
+                toast.error(error.response?.data?.message || "Failed to create lecture");
+            } finally {
+                setLoading(false);
+            }
+        };
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-5">

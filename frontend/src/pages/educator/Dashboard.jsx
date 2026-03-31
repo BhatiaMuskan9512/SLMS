@@ -93,7 +93,7 @@ const Dashboard = () => {
 
                     <div className="overflow-x-auto">
                         <table className="w-full text-left">
-                            <thead className="bg-[#FAF9F6] text-gray-400 text-xs font-bold uppercase">
+                            <thead className="bg-[#FAF9F6] text-gray-1000 text-[11px] font-black uppercase tracking-wider">
                                 <tr>
                                     <th className="px-8 py-5">Course Details</th>
                                     <th className="px-8 py-5 text-center">Status</th>
@@ -115,7 +115,10 @@ const Dashboard = () => {
                                                 {course.isPublished ? 'Live' : 'Draft'}
                                             </span>
                                         </td>
-                                        <td className="px-8 py-6 text-center font-bold text-gray-800">₹{course.coursePrice}</td>
+                                        {/* <td className="px-8 py-6 text-center font-bold text-gray-800">₹{course.coursePrice}</td> */}
+                                        <td className="px-8 py-6 text-center font-bold text-gray-700">
+                                        {course.price ? `₹${course.price}` : <span className="text-gray-400 font-normal italic">Free</span>}
+                                        </td>
                                         <td className="px-8 py-6">
                                             <div className="flex justify-end gap-2">
                                                 {/* Edit Course Details */}
