@@ -10,7 +10,9 @@ import {
     getCourseLectures,
     editLecture,
     removeLecture,
-    getCreatorById
+    getCreatorById,
+    enrollInCourse,
+    getEnrolledCourses
 } from "../controllers/courseController.js";
 import isAuth from "../middleware/isAuth.js";
 import upload from "../middleware/multer.js";
@@ -39,6 +41,12 @@ courseRouter.delete("/remove/:courseId", isAuth, removeCourse);
 
 // Get Creator info (Public/Internal)
 courseRouter.post("/creator", isAuth, getCreatorById);
+
+// Enroll a user in a course (Protected)
+courseRouter.post("/:courseId/enroll", isAuth, enrollInCourse); // <-- 2. YAHAN NAYA ROUTE ADD KIYA HAI
+
+// Get enrolled courses for the student dashboard
+courseRouter.get("/my-courses", isAuth, getEnrolledCourses);
 
 
 // --- FOR LECTURES ---

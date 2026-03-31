@@ -265,4 +265,55 @@ export const getCreatorById = async (req, res) => {
     } catch (error) {
         return res.status(500).json({ message: `Failed to get creator: ${error.message}` });
     }
+
+
+};
+
+export const enrollInCourse = async (req, res) => {
+    try {
+        const courseId = req.params.courseId;
+        const userId = req.userId; // Ye aapke auth middleware (jaise isAuth) se aana chahiye
+
+        // User aur Course ko find karein
+        const user = await User.findById(userId);
+        const course = await Course.findById(courseId);
+
+        if (!user || !course) {
+            return res.status(404).json({ message: "User or Course not found" });
+        }
+
+        // Check karein ki kya user pehle se enrolled toh nahi hai
+        if (course.enrolledStudents.includes(userId)) {
+            return res.status(400).json({ message: "You are already enrolled in this course!" });
+        }
+
+        // Course ke andar student ki ID save karein
+        course.enrolledStudents.push(userId);
+        await course.save();
+
+        // User ke andar course ki ID save karein
+        user.enrolledCourses.push(courseId);
+        await user.save();
+
+        return res.status(200).json({ message: "🎉 Successfully Enrolled!" });
+
+    } catch (error) {
+        return res.status(500).json({ message: `Enrollment failed: ${error.message}` });
+    }
+};
+
+export const getEnrolledCourses = async (req, res) => {
+    try {
+        // Hum user ko uske 'enrolledCourses' ke data ke saath fetch karenge
+        const user = await User.findById(req.userId).populate('enrolledCourses');
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Sirf courses ka array bhej denge
+        return res.status(200).json(user.enrolledCourses);
+    } catch (error) {
+        return res.status(500).json({ message: `Failed to fetch enrolled courses: ${error.message}` });
+    }
 };

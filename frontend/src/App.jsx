@@ -149,6 +149,7 @@ import EditLecture from './pages/educator/EditLecture';
 
 import EDashboard from './pages/educator/Dashboard';
 import SDashboard from './pages/student/Dashboard';
+import CoursePlayer from './pages/CoursePlayer';
 
 import Process from './pages/process';
 
@@ -233,6 +234,7 @@ const App = () => {
                     {/* --- Student Routes (Authentication Required) --- */}
                     <Route path="/my-courses" element={isAuthenticated ? <MyEnrolledCourses /> : <Navigate to="/login" />} />
                     <Route path="/view-lectures/:courseId" element={isAuthenticated ? <ViewLectures /> : <Navigate to="/login" />} />
+                    <Route path="/course-player/:courseId" element={isAuthenticated ? <CoursePlayer /> : <Navigate to="/login" />} />
                     <Route path="/my-profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
                     <Route path="/edit-profile" element={isAuthenticated ? <EditProfile /> : <Navigate to="/login" />} />
                     
