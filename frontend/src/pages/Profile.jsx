@@ -21,16 +21,25 @@ const Profile = () => {
     // 1. Get user data from Redux
     const { user, isAuthenticated } = useSelector((state) => state.auth);
 
-    // 2. Handle Logout
-    const handleLogout = async () => {
-        try {
-            await dispatch(logoutUser()).unwrap();
-            toast.success("Logged out successfully");
-            navigate("/login");
-        } catch (error) {
-            toast.error("Logout failed");
-        }
-    };
+    // // 2. Handle Logout
+    // const handleLogout = async () => {
+    //     try {
+    //         const res = await axios.get("http://localhost:8000/api/auth/log-out", {
+    //             withCredentials: true 
+    //         });
+
+    //         if (res.data.success) {
+    //             dispatch(logoutUser());
+    //             localStorage.clear();
+    //             toast.success(res.data.message || "Logged out successfully");
+    //             setIsProfileOpen(false);
+    //             navigate("/login");
+    //         }
+    //     } catch (error) {
+    //         console.log(error);
+    //         toast.error("Logout failed!");
+    //     }
+    // };
 
     // 3. Security Redirect: If not logged in, go to login
     if (!isAuthenticated) {
@@ -98,7 +107,7 @@ const Profile = () => {
                     </div>
 
                     {/* Logout Button */}
-                    <button 
+                    {/* <button 
                         onClick={handleLogout}
                         className="w-full flex items-center justify-between p-5 hover:bg-red-50 transition-all group"
                     >
@@ -109,12 +118,12 @@ const Profile = () => {
                             <span className="font-semibold text-red-600">Logout from Device</span>
                         </div>
                         <BiChevronRight className="text-gray-300 group-hover:text-red-600 transition-all text-2xl" />
-                    </button>
+                    </button> */}
                 </div>
 
                 {/* --- Footer Note --- */}
                 <p className="text-center text-gray-400 text-[11px] mt-8 uppercase tracking-widest font-medium">
-                    Joined Virtual Course LMS in 2026
+                    Joined SkilLink in 2026
                 </p>
             </div>
 

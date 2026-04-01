@@ -363,7 +363,7 @@ const Dashboard = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                     <StatCard icon={<FaBook />} label="Total Courses" value={courses.length} color="text-blue-500" bg="bg-blue-50" />
                     <StatCard icon={<FaUsers />} label="Total Students" value={totalStudents} color="text-green-500" bg="bg-green-50" />
-                    <StatCard icon={<FaChartBar />} label="Total Earnings" value={`₹${totalEarnings}`} color="text-orange-500" bg="bg-orange-50" />
+                    <StatCard icon={<FaChartBar />} label="Total Earnings" value={`₹${0}`} color="text-orange-500" bg="bg-orange-50" />
                 </div>
 
                 {/* Simplified List */}

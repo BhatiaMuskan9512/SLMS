@@ -107,10 +107,10 @@ const AllCourses = () => {
                         </p>
                     </div>
 
-                    <button className="flex items-center gap-2 bg-white border border-gray-200 text-[#0a0b0f] px-5 py-2.5 rounded-xl font-medium shadow-sm hover:border-[#d4a843] hover:text-[#d4a843] transition-colors">
+                    {/* <button className="flex items-center gap-2 bg-white border border-gray-200 text-[#0a0b0f] px-5 py-2.5 rounded-xl font-medium shadow-sm hover:border-[#d4a843] hover:text-[#d4a843] transition-colors">
                         <BiSortAlt2 className="text-xl" />
                         <span>Filter by Category</span>
-                    </button>
+                    </button> */}
                 </div>
             </div>
 

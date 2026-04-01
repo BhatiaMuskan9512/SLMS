@@ -92,6 +92,7 @@ const Login = () => {
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
+                    
                             />
                         </div>
                     </div>
@@ -112,6 +113,7 @@ const Login = () => {
                                 value={formData.password}
                                 onChange={handleChange}
                                 required
+                            
                             />
                             <button 
                                 type="button"
