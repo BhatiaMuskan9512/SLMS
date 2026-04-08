@@ -60,7 +60,7 @@
     font-weight: 700;
     color: rgba(255, 255, 255, 0.3);
     text-transform: uppercase;
-    tracking-widest: 1.5px;
+    /* tracking-widest: 1.5px; */
 }
 
 /* INDIVIDUAL NAV ITEM */
