@@ -144,7 +144,10 @@ export const login = async (req, res) => {
             const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
 
             // 6. Success Response
-            return res.status(200).cookie("token", token, { httpOnly: true, sameSite: 'strict', maxAge: 24 * 60 * 60 * 1000 }).json({
+            return res.status(200).cookie("token", token, { httpOnly: true,
+                                                             
+                                                             secure : false,
+                                                              maxAge: 24 * 60 * 60 * 1000 }).json({
                 success: true,
                 message: `Welcome back, ${user.name}`,
                 user: {
@@ -195,7 +198,13 @@ export const login = async (req, res) => {
 export const logout = async (req, res) => {
     try {
         // Cookie ko clear kar rahe hain
-        return res.status(200).cookie("token", "", { maxAge: 0 }).json({
+        return res.status(200).cookie("token", "", {
+            httpOnly: true,
+            sameSite:"lax",
+            secure:false,
+            maxAge: 0 
+            
+            }).json({
             success: true,
             message: "Logged out successfully."
         });

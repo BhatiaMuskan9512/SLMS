@@ -51,11 +51,10 @@ const CreateCourse = () => {
             
             {/* --- Back Button --- */}
             <button 
-                onClick={() => navigate('/educator/courses')}
+                onClick={() => navigate('/educator/dashboard')}
                 className="mb-6 flex items-center gap-2 text-gray-500 hover:text-black transition-colors self-start max-w-[1200px] mx-auto w-full"
             >
-                <BiArrowBack /> Back to Courses
-            </button>
+                <BiArrowBack /> Back to Dashboard            </button>
 
             {/* --- Form Card --- */}
             <div className="w-full max-w-[600px] bg-white rounded-2xl shadow-sm border border-gray-100 p-8 sm:p-12">

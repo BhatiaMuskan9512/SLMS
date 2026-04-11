@@ -150,9 +150,12 @@ import EditLecture from './pages/educator/EditLecture';
 import EDashboard from './pages/educator/Dashboard';
 import SDashboard from './pages/student/Dashboard';
 import CoursePlayer from './pages/CoursePlayer';
+import Students from './pages/educator/Students';
 
 import Process from './pages/process';
 
+axios.defaults.baseURL = "http://localhost:8000";
+axios.defaults.withCredentials=true;
 // --- Redux Actions ---
 import { setUser, setIsAuthenticated, setLoading } from './redux/authSlice';
 
@@ -175,6 +178,25 @@ const SmartFooter = () => {
   }
 
   return <Footer />; 
+};
+
+// 🌟 SMART NAVBAR LOGIC — add this right below SmartFooter
+const SmartNavbar = () => {
+  const location = useLocation();
+  const shouldHide = location.pathname.startsWith('/educator');
+  if (shouldHide) return null;
+  return <Navbar />;
+};
+
+// 🌟 SMART MAIN WRAPPER
+const SmartMain = ({ children }) => {
+  const location = useLocation();
+  const isEducator = location.pathname.startsWith('/educator');
+  return (
+    <main className={isEducator ? "" : "pt-[80px] min-h-screen"}>
+      {children}
+    </main>
+  );
 };
 
 const App = () => {
@@ -210,60 +232,120 @@ const App = () => {
     );
     
     return (
-        <BrowserRouter>
-            <Toaster position="top-center" reverseOrder={false} />
-            
-            <Navbar />
-           
-            <main className="pt-[80px] min-h-screen">
-                <Routes>
-                    {/* --- Public Routes --- */}
-                    <Route path="/" 
-                        element={ isAuthenticated ? (
-                        user?.role === 'student' ? 
-                        <Navigate to="/student/dashboard" /> 
-                        : <Navigate to="/educator/dashboard"/>): <Home />} />
-                    <Route path="/login"
-                        element={isAuthenticated  ? (
-                             user?.role === 'student' ? 
-                             <Navigate to="/student/dashboard" /> 
-                        : <Navigate to="/educator/dashboard"/>): <Login />} />
-                   
-                    <Route path="/student/dashboard" element={<SDashboard />} />
-                    <Route path="/educator/dashboard" element={<EDashboard />} />
-                    
-                    <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/" />} />
-                    <Route path="/forget-password" element={<ForgetPassword />} />
-                    <Route path="/verify-otp" element={<VerifyOTP />} />
-                    <Route path="/reset-password" element={<ResetPassword />} />
+    <BrowserRouter>
+        <Toaster position="top-center" reverseOrder={false} />
+        
+        <SmartNavbar />
+       
+        <SmartMain>
+            <Routes>
+                {/* --- Public Routes --- */}
+                <Route path="/" 
+                    element={ isAuthenticated ? (
+                    user?.role === 'student' ? 
+                    <Navigate to="/student/dashboard" /> 
+                    : <Navigate to="/educator/dashboard"/>): <Home />} />
+                <Route path="/login"
+                    element={isAuthenticated  ? (
+                         user?.role === 'student' ? 
+                         <Navigate to="/student/dashboard" /> 
+                    : <Navigate to="/educator/dashboard"/>): <Login />} />
+               
+                <Route path="/student/dashboard" element={<SDashboard />} />
+                <Route path="/educator/dashboard" element={<EDashboard />} />
+                
+                <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/" />} />
+                <Route path="/forget-password" element={<ForgetPassword />} />
+                <Route path="/verify-otp" element={<VerifyOTP />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
 
-                    {/* --- Course Explorer Routes --- */}
-                    <Route path="/all-courses" element={<AllCourses />} />
-                    <Route path="/course-detail/:courseId" element={<CourseDetail />} />
+                {/* --- Course Explorer Routes --- */}
+                <Route path="/all-courses" element={<AllCourses />} />
+                <Route path="/course-detail/:courseId" element={<CourseDetail />} />
 
-                    {/* --- Student Routes (Authentication Required) --- */}
-                    <Route path="/my-courses" element={isAuthenticated ? <MyEnrolledCourses /> : <Navigate to="/login" />} />
-                    <Route path="/view-lectures/:courseId" element={isAuthenticated ? <ViewLectures /> : <Navigate to="/login" />} />
-                    <Route path="/course-player/:courseId" element={isAuthenticated ? <CoursePlayer /> : <Navigate to="/login" />} />
-                    <Route path="/my-profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
-                    <Route path="/edit-profile" element={isAuthenticated ? <EditProfile /> : <Navigate to="/login" />} />
-                    <Route path="/student/progress" element={isAuthenticated ? <div className="p-10 ml-[280px]">Progress Page Coming Soon</div> : <Navigate to="/login" />} />
-                    <Route path="/student/settings" element={isAuthenticated ? <div className="p-10 ml-[280px]">Settings Page Coming Soon</div> : <Navigate to="/login" />} />
+                {/* --- Student Routes (Authentication Required) --- */}
+                <Route path="/my-courses" element={isAuthenticated ? <MyEnrolledCourses /> : <Navigate to="/login" />} />
+                <Route path="/view-lectures/:courseId" element={isAuthenticated ? <ViewLectures /> : <Navigate to="/login" />} />
+                <Route path="/course-player/:courseId" element={isAuthenticated ? <CoursePlayer /> : <Navigate to="/login" />} />
+                <Route path="/my-profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
+                <Route path="/edit-profile" element={isAuthenticated ? <EditProfile /> : <Navigate to="/login" />} />
+                <Route path="/student/progress" element={isAuthenticated ? <div className="p-10 ml-[280px]">Progress Page Coming Soon</div> : <Navigate to="/login" />} />
+                <Route path="/student/settings" element={isAuthenticated ? <div className="p-10 ml-[280px]">Settings Page Coming Soon</div> : <Navigate to="/login" />} />
 
-                    {/* --- Educator Management Routes --- */}
-                    <Route path="/educator/courses" element={user?.role === 'educator' ? <Courses /> : <Navigate to="/login" />} />
-                    <Route path="/educator/create-course" element={user?.role === 'educator' ? <CreateCourse /> : <Navigate to="/" />} />
-                    <Route path="/educator/edit-course/:courseId" element={user?.role === 'educator' ? <EditCourse /> : <Navigate to="/" />} />
-                    <Route path="/educator/create-lecture/:courseId" element={user?.role === 'educator' ? <CreateLecture /> : <Navigate to="/" />} />
-                    <Route path="/educator/edit-lecture/:lectureId" element={user?.role === 'educator' ? <EditLecture /> : <Navigate to="/" />} />
-
-                </Routes>
-            </main>
-              
-           {/* 🌟 Smart Footer */}
-           <SmartFooter />
-        </BrowserRouter>
-    );
+                {/* --- Educator Management Routes --- */}
+                <Route path="/educator/courses" element={user?.role === 'educator' ? <Courses /> : <Navigate to="/login" />} />
+                <Route path="/educator/create-course" element={user?.role === 'educator' ? <CreateCourse /> : <Navigate to="/" />} />
+                <Route path="/educator/edit-course/:courseId" element={user?.role === 'educator' ? <EditCourse /> : <Navigate to="/" />} />
+                <Route path="/educator/create-lecture/:courseId" element={user?.role === 'educator' ? <CreateLecture /> : <Navigate to="/" />} />
+                <Route path="/educator/edit-lecture/:lectureId" element={user?.role === 'educator' ? <EditLecture /> : <Navigate to="/" />} />
+                <Route path="/educator/students" element={user?.role === 'educator' ? <Students /> : <Navigate to="/" />} />
+            </Routes>
+        </SmartMain>
+          
+       <SmartFooter />
+    </BrowserRouter>
+);
 };
-
 export default App;
+
+
+
+ 
+//     return (
+//         <BrowserRouter>
+//             <Toaster position="top-center" reverseOrder={false} />
+            
+//             <Navbar />
+           
+//             <main className="pt-[80px] min-h-screen">
+//                 <Routes>
+//                     {/* --- Public Routes --- */}
+//                     <Route path="/" 
+//                         element={ isAuthenticated ? (
+//                         user?.role === 'student' ? 
+//                         <Navigate to="/student/dashboard" /> 
+//                         : <Navigate to="/educator/dashboard"/>): <Home />} />
+//                     <Route path="/login"
+//                         element={isAuthenticated  ? (
+//                              user?.role === 'student' ? 
+//                              <Navigate to="/student/dashboard" /> 
+//                         : <Navigate to="/educator/dashboard"/>): <Login />} />
+                   
+//                     <Route path="/student/dashboard" element={<SDashboard />} />
+//                     <Route path="/educator/dashboard" element={<EDashboard />} />
+                    
+//                     <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/" />} />
+//                     <Route path="/forget-password" element={<ForgetPassword />} />
+//                     <Route path="/verify-otp" element={<VerifyOTP />} />
+//                     <Route path="/reset-password" element={<ResetPassword />} />
+
+//                     {/* --- Course Explorer Routes --- */}
+//                     <Route path="/all-courses" element={<AllCourses />} />
+//                     <Route path="/course-detail/:courseId" element={<CourseDetail />} />
+
+//                     {/* --- Student Routes (Authentication Required) --- */}
+//                     <Route path="/my-courses" element={isAuthenticated ? <MyEnrolledCourses /> : <Navigate to="/login" />} />
+//                     <Route path="/view-lectures/:courseId" element={isAuthenticated ? <ViewLectures /> : <Navigate to="/login" />} />
+//                     <Route path="/course-player/:courseId" element={isAuthenticated ? <CoursePlayer /> : <Navigate to="/login" />} />
+//                     <Route path="/my-profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
+//                     <Route path="/edit-profile" element={isAuthenticated ? <EditProfile /> : <Navigate to="/login" />} />
+//                     <Route path="/student/progress" element={isAuthenticated ? <div className="p-10 ml-[280px]">Progress Page Coming Soon</div> : <Navigate to="/login" />} />
+//                     <Route path="/student/settings" element={isAuthenticated ? <div className="p-10 ml-[280px]">Settings Page Coming Soon</div> : <Navigate to="/login" />} />
+
+//                     {/* --- Educator Management Routes --- */}
+//                     <Route path="/educator/courses" element={user?.role === 'educator' ? <Courses /> : <Navigate to="/login" />} />
+//                     <Route path="/educator/create-course" element={user?.role === 'educator' ? <CreateCourse /> : <Navigate to="/" />} />
+//                     <Route path="/educator/edit-course/:courseId" element={user?.role === 'educator' ? <EditCourse /> : <Navigate to="/" />} />
+//                     <Route path="/educator/create-lecture/:courseId" element={user?.role === 'educator' ? <CreateLecture /> : <Navigate to="/" />} />
+//                     <Route path="/educator/edit-lecture/:lectureId" element={user?.role === 'educator' ? <EditLecture /> : <Navigate to="/" />} />
+
+//                 </Routes>
+//             </main>
+              
+//            {/* 🌟 Smart Footer */}
+//            <SmartFooter />
+//         </BrowserRouter>
+//     );
+// };
+
+// export default App;

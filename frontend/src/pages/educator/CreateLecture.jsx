@@ -77,10 +77,10 @@ const CreateLecture = () => {
             
             {/* --- Back Button --- */}
             <button 
-                onClick={() => navigate(`/educator/edit-course/${courseId}`)}
+                onClick={() => navigate('/educator/courses')}
                 className="mb-6 flex items-center gap-2 text-gray-500 hover:text-black transition-colors self-start max-w-[500px] mx-auto w-full"
             >
-                <BiArrowBack /> Back to Edit Course
+                <BiArrowBack /> Back to Courses
             </button>
 
             {/* --- Form Card --- */}

@@ -61,8 +61,8 @@ const Hero = ({ setIsHovering }) => {
         {/* Actions */}
         <div className="animate-fade-up delay-400 flex flex-wrap items-center justify-center gap-4">
           <button 
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
+            // onMouseEnter={() => setIsHovering(true)}
+            // onMouseLeave={() => setIsHovering(false)}
             className="px-10 py-4 bg-[#0a0b0f] text-[#e8c96d] rounded-xl font-semibold text-[15px] shadow-2xl shadow-[#d4a84366] hover:bg-[#d4a843] hover:text-[#0a0b0f] transition-all duration-300 transform hover:-translate-y-1"
           >
             Start Learning Free →

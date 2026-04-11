@@ -41,7 +41,7 @@ const Logos = () => {
         {/* Header Section */}
         <div className="mb-16 animate-fade-up">
           <span className="text-[11.5px] tracking-[2px] uppercase text-[#d4a843] font-semibold block mb-4">
-            Why EduNova
+            Why SkillLink
           </span>
           <h2 className="font-cormorant text-[clamp(32px,5vw,58px)] font-light leading-[1.2] text-[#0a0b0f] mb-4">
             Everything you need to <br />

@@ -16,7 +16,7 @@ const Footer = () => {
               onClick={scrollToTop}
               className="font-cormorant text-3xl font-bold text-white cursor-pointer block mb-6"
             >
-              Edu<span className="text-[#d4a843]">Nova</span>
+             Skill<span className="text-[#d4a843]">Link</span>
             </span>
             <p className="font-outfit text-white/40 text-sm leading-relaxed max-w-xs font-light">
               The world's most elegant learning management system. Built for ambitious minds.
@@ -72,7 +72,7 @@ const Footer = () => {
         {/* Footer Bottom */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-[13px] text-white/20 font-light">
-            © 2026 EduNova Technologies Pvt. Ltd. All rights reserved.
+            © 2026 SkillLink Technologies Pvt. Ltd. All rights reserved.
           </div>
           <div className="text-[13px] text-white/20 font-light">
             Made with <span className="text-[#d4a843]">♥</span> in India

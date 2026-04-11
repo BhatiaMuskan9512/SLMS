@@ -13,6 +13,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { logoutUser } from '../redux/authSlice';
 import toast from 'react-hot-toast';
+import axios from 'axios';
 
 const Profile = () => {
     const navigate = useNavigate();
@@ -24,19 +25,22 @@ const Profile = () => {
     // 2. Handle Logout
     const handleLogout = async () => {
         try {
-            await dispatch(logoutUser()).unwrap();
-            toast.success("Logged out successfully");
-            navigate("/login");
+            const res = await axios.get("http://localhost:8000/api/auth/log-out", {
+                withCredentials: true 
+            });
+
+            if (res.data.success) {
+                dispatch(logoutUser());
+                localStorage.clear();
+                toast.success(res.data.message || "Logged out successfully");
+        
+                navigate("/login");
+            }
         } catch (error) {
-            toast.error("Logout failed");
+            console.log(error);
+            toast.error("Logout failed!");
         }
     };
-
-    // 3. Security Redirect: If not logged in, go to login
-    if (!isAuthenticated) {
-        navigate('/login');
-        return null;
-    }
 
     return (
         <div className="min-h-screen bg-gray-50 pt-[120px] pb-20 px-5 flex flex-col items-center">
@@ -114,7 +118,7 @@ const Profile = () => {
 
                 {/* --- Footer Note --- */}
                 <p className="text-center text-gray-400 text-[11px] mt-8 uppercase tracking-widest font-medium">
-                    Joined Virtual Course LMS in 2026
+                    Joined SkillLink in 2026
                 </p>
             </div>
 

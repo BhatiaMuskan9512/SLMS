@@ -319,6 +319,7 @@ const Navbar = () => {
     };
 
     return (
+        
         <nav className="w-full h-[80px] bg-[#F9F6EE] border-b border-[#D4A373]/20 fixed top-0 left-0 z-50 px-5 sm:px-10 flex items-center justify-between font-jakarta">
             
             {/* --- Logo Section --- */}
@@ -347,6 +348,7 @@ const Navbar = () => {
             </form> */}
 
             {/* --- Navigation Links --- */}
+          
             <div className="flex items-center gap-4 sm:gap-6">
                 
                 <div className="hidden lg:flex items-center gap-8 text-[15px] font-bold text-[#1A1A1A]/70">
