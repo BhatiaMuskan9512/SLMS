@@ -317,3 +317,52 @@ export const getEnrolledCourses = async (req, res) => {
         return res.status(500).json({ message: `Failed to fetch enrolled courses: ${error.message}` });
     }
 };
+
+
+// courseController.js
+export const getCourseCount = async (req, res) => {
+    try{
+        // 1. Total count nikalenge
+        const count = await Course.countDocuments();
+
+
+        // 2. Saare courses ke sirf title aur id mangwayenge dropdown ke liye
+        const courses = await Course.find({}, "title");
+        return res.status(200).json({
+            success: true,
+            count: count,
+            courses: courses
+        });
+    } catch(error){
+        return res.status(500).json({success: false, message: error.message});
+    }
+};
+
+
+// courseController.js
+export const getCourseCategoryStats = async (req, res) => {
+    try {
+        // MongoDB aggregation ka use karke category wise count nikalenge
+        const stats = await Course.aggregate([
+            {
+                $group: {
+                    _id: "$category", // Aapke Course model mein jo category field hai
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Data ko frontend ke format mein convert karein
+        const formattedStats = stats.map(item => ({
+            name: item._id || "Uncategorized",
+            value: item.count
+        }));
+
+        return res.status(200).json({
+            success: true,
+            stats: formattedStats
+        });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};

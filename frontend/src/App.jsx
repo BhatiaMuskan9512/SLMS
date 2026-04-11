@@ -155,6 +155,7 @@ import Process from './pages/process';
 
 // --- Redux Actions ---
 import { setUser, setIsAuthenticated, setLoading } from './redux/authSlice';
+import Dashboard from './pages/Admin/Dashboard';
 
 // 🌟 SMART FOOTER LOGIC
 const SmartFooter = () => {
@@ -232,6 +233,7 @@ const App = () => {
                     <Route path="/student/dashboard" element={<SDashboard />} />
                     <Route path="/educator/dashboard" element={<EDashboard />} />
                     
+                    <Route path="/admin/dashboard" element={<Dashboard/>}/>
                     <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/" />} />
                     <Route path="/forget-password" element={<ForgetPassword />} />
                     <Route path="/verify-otp" element={<VerifyOTP />} />
@@ -257,7 +259,8 @@ const App = () => {
                     <Route path="/educator/create-lecture/:courseId" element={user?.role === 'educator' ? <CreateLecture /> : <Navigate to="/" />} />
                     <Route path="/educator/edit-lecture/:lectureId" element={user?.role === 'educator' ? <EditLecture /> : <Navigate to="/" />} />
 
-                </Routes>
+                    {/* <Route path="/admin/create-course" element={user?.role === 'admin' ? <CreateCourse /> : <Navigate to="/" />} /> */}
+                </Routes> 
             </main>
               
            {/* 🌟 Smart Footer */}

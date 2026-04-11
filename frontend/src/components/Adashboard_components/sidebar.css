@@ -1,0 +1,119 @@
+:root {
+  --sidebar-bg: #121212;      /* SkillLink Dark Black */
+  --sidebar-active: #1A1A1A;  /* Active Background */
+  --gold: #E5B95F;            /* SkillLink Premium Gold */
+  --text-muted: #888888;
+  --text-light: #FFFFFF;
+}
+
+.lms-sidebar {
+  width: 270px;
+  height: 100vh;
+  background-color: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  padding: 2rem 1rem;
+  position: fixed;
+  left: 0;
+  top: 0;
+  color: var(--text-light);
+  box-shadow: 4px 0 10px rgba(0,0,0,0.3);
+  z-index: 1000;
+  border-right: 1px solid rgba(255, 255, 255, 0.05); /* Halka border premium look ke liye */
+}
+
+/* Logo Styling */
+.sidebar-logo {
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 3rem;
+  padding-left: 1rem;
+  font-family: 'Playfair Display', serif;
+}
+
+.logo-white { color: var(--text-light); }
+.logo-gold { color: var(--gold); }
+
+/* Navigation Links */
+.sidebar-nav {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0.8rem 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  color: var(--text-muted); /* Default color grey */
+  transition: all 0.3s ease;
+  font-weight: 500;
+  text-decoration: none; /* Agar NavLink use ho raha hai toh */
+}
+
+/* Hover State */
+.nav-item:hover {
+  color: var(--text-light);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* --- ACTIVE STATE LOGIC (Main Change) --- */
+.nav-item.active {
+  background-color: var(--sidebar-active);
+  color: var(--gold) !important; /* Text Gold ho jayega */
+  border-left: 3px solid var(--gold);
+  border-radius: 0 12px 12px 0; /* Left side se straight, right se round */
+}
+
+/* Icon color change when active */
+.nav-item.active .nav-icon {
+  color: var(--gold);
+}
+
+.nav-icon {
+  display: flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+/* Footer Section */
+.sidebar-footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.account-tag {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 1.5px;
+  margin-bottom: 0.8rem;
+  padding-left: 1rem;
+}
+
+.logout-btn {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 0.8rem 1rem;
+  background: none;
+  border: none;
+  color: var(--text-muted); /* Logout ko Red rakha hai taaki clear dikhe */
+  cursor: pointer;
+  font-weight: 600;
+  width: 100%;
+  border-radius: 12px;
+  transition: all 0.3s;
+}
+
+.logout-btn:hover {
+  background-color: rgba(255, 255, 255, 0.05);
+  color:var(--text-light);
+}

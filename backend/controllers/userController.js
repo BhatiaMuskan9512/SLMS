@@ -72,3 +72,85 @@ export const updateProfile = async (req, res) => {
         });
     }
 };
+
+
+export const getAllUsers = async (req, res)=>{
+    try{
+        //Hum unhe count kar rahe hai jinka role student hai
+        const students = await User.find({role: "student"}).populate("enrolledCourses");
+        return res.status(200).json(
+            {
+                success:true,
+                count: students.length, //Frontend isi 'count' ko use karega
+                users: students
+            });
+    } catch(error){
+        return res.status(500).json({success: false, message: error.message});
+    }
+};
+
+
+export const getInstructorCount = async (req,res) =>{
+    try{
+        //Apna role 'educator' 
+        const instructors = await User.find({role: "educator"});
+        return res.status(200).json({
+            success: true,
+            count: instructors.length,
+            instructors: instructors
+        });
+    } catch(error){
+        return res.status(500).json({success: false, message: error.message});
+    }
+};
+
+
+// Naya Student Register karne ke liye
+export const register = async (req, res) => {
+    try {
+        const { name, email, password, role } = req.body;
+
+        // 1. Check karein ki user pehle se toh nahi hai
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ success: false, message: "Email already registered!" });
+        }
+
+        // 2. Naya user create karein (Password hash middleware agar lagaya hai toh theek, warna direct save)
+        const newUser = new User({
+            name,
+            email,
+            password, // ideally ise hash karna chahiye bcrypt se
+            role: role || 'student',
+            enrolledCourses: [] // Shuruat mein khali rakhenge jaisa aapne kaha
+        });
+
+        await newUser.save();
+
+        res.status(201).json({
+            success: true,
+            message: "Student registered successfully!",
+            user: newUser
+        });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
+
+export const deleteStudent = async (req, res) => {
+    try {
+        const { id } = req.params; // 🌟 Frontend se ID params mein aayegi
+        const user = await User.findByIdAndDelete(id);
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "Student not found!" });
+        }
+
+        res.status(200).json({ success: true, message: "Student deleted successfully!" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
