@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-
+import { useNavigate } from 'react-router-dom';
 const Hero = ({ setIsHovering }) => {
   // Stats Counting Logic
+  const navigate = useNavigate();
   const [counts, setCounts] = useState({ learners: 0, courses: 0, rate: 0, countries: 0 });
 
   useEffect(() => {
@@ -60,19 +61,19 @@ const Hero = ({ setIsHovering }) => {
 
         {/* Actions */}
         <div className="animate-fade-up delay-400 flex flex-wrap items-center justify-center gap-4">
-          <button 
-            // onMouseEnter={() => setIsHovering(true)}
-            // onMouseLeave={() => setIsHovering(false)}
-            className="px-10 py-4 bg-[#0a0b0f] text-[#e8c96d] rounded-xl font-semibold text-[15px] shadow-2xl shadow-[#d4a84366] hover:bg-[#d4a843] hover:text-[#0a0b0f] transition-all duration-300 transform hover:-translate-y-1"
+            <button 
+            // 3. Add onClick to navigate to login
+            onClick={() => navigate('/login')} 
+            className="px-10 py-5 bg-[#0a0b0f] text-white rounded-xl font-outfit font-semibold text-[16px] shadow-2xl shadow-black/10 hover:bg-[#d4a843] hover:text-[#0a0b0f] transition-all duration-300 transform hover:-translate-y-1 active:scale-95"
           >
             Start Learning Free →
           </button>
-          <button 
+          {/* <button 
            
             className="px-10 py-4 border border-black/20 rounded-xl font-medium text-[#0a0b0f] flex items-center gap-2 hover:bg-[#d4a8430d] hover:border-[#d4a843] transition-all"
           >
             ▶ Watch Demo
-          </button>
+          </button> */}
         </div>
 
         {/* Social Proof */}

@@ -1,6 +1,10 @@
 import express from "express";
 import { 
+    deleteStudent,
+    getAllUsers,
     getCurrentUser, 
+    getInstructorCount, 
+    register, 
     updateProfile 
 } from "../controllers/userController.js";
 import isAuth from "../middleware/isAuth.js";
@@ -8,6 +12,14 @@ import upload from "../middleware/multer.js";
 
 const userRouter = express.Router();
 
+
+userRouter.get("/all",getAllUsers);
+
+userRouter.get("/instructors-count", getInstructorCount);
+
+userRouter.post("/register",register);
+
+userRouter.delete("/delete-student/:id",deleteStudent);
 /**
  * Route to Get Current Logged-in User Data
  * Protected: Uses isAuth to extract userId from the token

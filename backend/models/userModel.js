@@ -20,7 +20,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ["student", "educator"],
+        enum: ["student", "educator","admin"],
         required: true
     },
     photoUrl: {
@@ -29,8 +29,22 @@ const userSchema = new mongoose.Schema({
     },
     enrolledCourses: [
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "Course"
+            courseId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Course",
+                required: true
+            },
+            completedLectures: [
+                {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "Lecture" // Agar aapka Lecture model alag hai toh
+                }
+            ],
+            // 🌟 Aap yahan direct percentage bhi calculate karke rakh sakte hain
+            courseProgress: {
+                type: Number,
+                default: 0
+            }
         }
     ],
     // --- Forget Password Logic Fields ---
@@ -43,7 +57,21 @@ const userSchema = new mongoose.Schema({
     isOtpVerified: {
         type: Boolean,
         default: false
-    }
+    },
+    // userModel.js mein
+   totalMinutesLearned: { 
+    type: Number, 
+    default: 0 
+   },
+  
+lastLectureDate: { 
+    type: Date, 
+    default: null 
+},
+streakCount: { 
+    type: Number, 
+    default: 0 
+}
 }, { timestamps: true });
 
 const User = mongoose.model("User", userSchema);

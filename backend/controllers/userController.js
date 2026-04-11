@@ -4,22 +4,39 @@ import uploadOnCloudinary from "../config/cloudinary.js";
 // --- 1. GET CURRENT LOGGED-IN USER ---
 export const getCurrentUser = async (req, res) => {
     try {
-        // The userId is provided by the isAuth middleware
+        // Step A: Deep Populate courseId taaki course ke details mil sakein
         const user = await User.findById(req.userId)
-            .select("-password") // Exclude password for security
-            .populate("enrolledCourses"); // Populate course details for the 'My Courses' section
+            .select("-password")
+            .populate({
+                path: 'enrolledCourses.courseId', // 🌟 Naye structure ke hisaab se populate
+                model: 'Course'
+            });
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        return res.status(200).json({
-            success:true,
-            user: {
-                name : user.name,
-                email : user.email,
-                enrolledCourses: user.enrolledCourses || []
+        // Step B: Data ko "Flatten" karna taaki Frontend ko "toLowerCase" error na mile
+        const formattedCourses = user.enrolledCourses.map(item => {
+            if (!item.courseId) return null; // Safety check
+            
+            return {
+                ...item.courseId._doc, // Course ke saare details (title, image, etc.)
+                progress: item.courseProgress || 0, // 🌟 Dynamic Progress value
+                completedLectures: item.completedLectures || []
+            };
+        }).filter(Boolean); // Invalid data ko remove karne ke liye
 
+        return res.status(200).json({
+            success: true,
+            user: {
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                photoUrl: user.photoUrl,
+                totalMinutesLearned: user.totalMinutesLearned,
+                streakCount: user.streakCount || 0,
+                enrolledCourses: formattedCourses // 🌟 Ab ye Dashboard ke liye ready hai
             }
         });
 
@@ -70,5 +87,87 @@ export const updateProfile = async (req, res) => {
         return res.status(500).json({ 
             message: `Update Profile Error: ${error.message}` 
         });
+    }
+};
+
+
+export const getAllUsers = async (req, res)=>{
+    try{
+        //Hum unhe count kar rahe hai jinka role student hai
+        const students = await User.find({role: "student"}).populate("enrolledCourses");
+        return res.status(200).json(
+            {
+                success:true,
+                count: students.length, //Frontend isi 'count' ko use karega
+                users: students
+            });
+    } catch(error){
+        return res.status(500).json({success: false, message: error.message});
+    }
+};
+
+
+export const getInstructorCount = async (req,res) =>{
+    try{
+        //Apna role 'educator' 
+        const instructors = await User.find({role: "educator"});
+        return res.status(200).json({
+            success: true,
+            count: instructors.length,
+            instructors: instructors
+        });
+    } catch(error){
+        return res.status(500).json({success: false, message: error.message});
+    }
+};
+
+
+// Naya Student Register karne ke liye
+export const register = async (req, res) => {
+    try {
+        const { name, email, password, role } = req.body;
+
+        // 1. Check karein ki user pehle se toh nahi hai
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ success: false, message: "Email already registered!" });
+        }
+
+        // 2. Naya user create karein (Password hash middleware agar lagaya hai toh theek, warna direct save)
+        const newUser = new User({
+            name,
+            email,
+            password, // ideally ise hash karna chahiye bcrypt se
+            role: role || 'student',
+            enrolledCourses: [] // Shuruat mein khali rakhenge jaisa aapne kaha
+        });
+
+        await newUser.save();
+
+        res.status(201).json({
+            success: true,
+            message: "Student registered successfully!",
+            user: newUser
+        });
+
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
+
+export const deleteStudent = async (req, res) => {
+    try {
+        const { id } = req.params; // 🌟 Frontend se ID params mein aayegi
+        const user = await User.findByIdAndDelete(id);
+
+        if (!user) {
+            return res.status(404).json({ success: false, message: "Student not found!" });
+        }
+
+        res.status(200).json({ success: true, message: "Student deleted successfully!" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: error.message });
     }
 };

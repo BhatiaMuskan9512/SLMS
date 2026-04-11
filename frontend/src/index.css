@@ -32,6 +32,8 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   background-color: #f9fafb; /* Matches Tailwind's bg-gray-50 */
+  font-family: 'Inter', 'Geist', 'Sans-Serif', system-ui;
+  -webkit-font-smoothing: antialiased;
 }
 
 #root {

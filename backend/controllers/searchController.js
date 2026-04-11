@@ -27,7 +27,7 @@ export const searchWithAi = async (req, res) => {
                 { category: { $regex: input, $options: "i" } },
                 { level: { $regex: input, $options: "i" } },
             ],
-        });
+        }).populate("creator", "name");
 
         // --- STEP 3: AI INTEGRATION (GEMINI) ---
         // If normal search finds nothing, or to handle natural language queries like "I want to learn web design"
@@ -61,7 +61,7 @@ export const searchWithAi = async (req, res) => {
                     { category: { $regex: keyword, $options: "i" } },
                     { level: { $regex: keyword, $options: "i" } },
                 ],
-            });
+            }).populate("creator", "name");
 
             return res.status(200).json(courses);
         }

@@ -16,7 +16,7 @@ const Footer = () => {
               onClick={scrollToTop}
               className="font-cormorant text-3xl font-bold text-white cursor-pointer block mb-6"
             >
-             Skill<span className="text-[#d4a843]">Link</span>
+              Skill<span className="text-[#d4a843]">Link</span>
             </span>
             <p className="font-outfit text-white/40 text-sm leading-relaxed max-w-xs font-light">
               The world's most elegant learning management system. Built for ambitious minds.

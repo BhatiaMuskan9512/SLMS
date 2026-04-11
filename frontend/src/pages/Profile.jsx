@@ -102,7 +102,7 @@ const Profile = () => {
                     </div>
 
                     {/* Logout Button */}
-                    <button 
+                    {/* <button 
                         onClick={handleLogout}
                         className="w-full flex items-center justify-between p-5 hover:bg-red-50 transition-all group"
                     >
@@ -113,12 +113,12 @@ const Profile = () => {
                             <span className="font-semibold text-red-600">Logout from Device</span>
                         </div>
                         <BiChevronRight className="text-gray-300 group-hover:text-red-600 transition-all text-2xl" />
-                    </button>
+                    </button> */}
                 </div>
 
                 {/* --- Footer Note --- */}
                 <p className="text-center text-gray-400 text-[11px] mt-8 uppercase tracking-widest font-medium">
-                    Joined SkillLink in 2026
+                    Joined SkilLink in 2026
                 </p>
             </div>
 

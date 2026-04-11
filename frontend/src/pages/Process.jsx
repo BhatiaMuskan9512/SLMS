@@ -11,7 +11,7 @@ const Process = () => {
 
   const steps = [
     { num: "01", title: "Create your free account", text: "Sign up in 30 seconds. No credit card required. Instantly access 200+ free lessons." },
-    { num: "02", title: "Get your AI learning path", text: "Tell us your goals. Our AI crafts a personalised curriculum just for you." },
+    { num: "02", title: "Get your learning path", text: "Tell us your goals. Our AI crafts a personalised curriculum just for you." },
     { num: "03", title: "Learn at your own pace", text: "Watch lessons, complete challenges, and track progress on any device, anytime." },
     { num: "04", title: "Earn & share certificates", text: "Complete your path, earn a verified certificate, and share it with the world." },
   ];

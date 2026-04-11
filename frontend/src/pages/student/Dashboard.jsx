@@ -1,10 +1,3 @@
-
-
-
-
-
-
-// // src/pages/student/Dashboard.jsx
 import React, { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -14,39 +7,56 @@ import StatCards from '../../components/Sdashboard_components/StatCards';
 import ContinueLearning from '../../components/Sdashboard_components/ContinueLearning';
 import Achievements from '../../components/Sdashboard_components/Achievements';
 import UpcomingSessions from '../../components/Sdashboard_components/UpcomingSessions';
+
 // ✅ Humne RecentActivity hatane ka faisla kiya hai
 
 const Dashboard = () => {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const { user, isAuthenticated } = useSelector((state) => state.auth);
+    const [view, setView] = useState("dashboard");
 
     const [enrolledCourses, setEnrolledCourses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
+    const [totalMinutes, setTotalMinutes] = useState(0);
+    const [streak, setStreak] = useState(0);
 
     // 1. Fetch Dynamic Data
     useEffect(() => {
-        if (!isAuthenticated) {
-            navigate("/login");
-            return;
-        }
+    if (!isAuthenticated) {
+        navigate("/login");
+        return;
+    }
 
-        const fetchDashboardData = async () => {
-            try {
-                // Fetch dynamic enrolled courses
-                const res = await axios.get("http://localhost:8000/api/course/my-courses", {
-                    withCredentials: true
-                });
-                setEnrolledCourses(res.data);
-            } catch (error) {
-                console.error("Dashboard fetch error", error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchDashboardData();
-    }, [isAuthenticated, navigate]);
+    const fetchDashboardData = async () => {
+        try {
+            // Courses fetch karein
+            const res = await axios.get("http://localhost:8000/api/course/my-courses", {
+                withCredentials: true
+            });
+            setEnrolledCourses(res.data);
+
+            // 🌟 Naya: User profile fetch karein fresh minutes ke liye
+            // Dashboard.jsx mein fetchDashboardData ke andar ye line change karein:
+
+const userRes = await axios.get("http://localhost:8000/api/user/get-current-user", { 
+    withCredentials: true 
+});
+
+if (userRes.data.success) {
+    // 🌟 Check karein: 'user' object ke andar 'totalMinutesLearned' hai ya nahi
+    setTotalMinutes(userRes.data.user.totalMinutesLearned || 0);
+    setStreak(userRes.data.user.streakCount || 0);
+}
+        } catch (error) {
+            console.error("Dashboard fetch error", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    fetchDashboardData();
+}, [isAuthenticated, navigate]);
 
     if (!isAuthenticated) return null; // Prevents flickering
 
@@ -57,79 +67,162 @@ const Dashboard = () => {
     );
     
 
-    const filteredCourses = enrolledCourses.filter(course => 
+    // Dono variables define karein taaki error na aaye
+const filteredCourses = enrolledCourses.filter(course => 
     course.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+);
 
-    return (
-       <div className="flex w-full h-screen bg-[#F6F4EC] overflow-hidden box-border">
+const filteredEnrolled = filteredCourses; // filteredEnrolled ko define kar diya
+
+return (
+    <div className="flex w-full h-screen bg-[#F6F4EC] overflow-hidden box-border">
+        
+        {/* --- SIDEBAR --- */}
+        <div className="w-[280px] hidden lg:block flex-shrink-0">
+            <Sidebar setView={setView} activeView={view} />
+        </div>
+        
+        {/* --- MAIN CONTENT AREA --- */}
+        <div className="flex-1 h-full overflow-y-auto overflow-x-hidden p-6 md:p-8 box-border">
+            <div className="max-w-[1400px] mx-auto">
             
-            {/* --- SIDEBAR --- */}
-            <div className="w-[280px] hidden lg:block flex-shrink-0">
-                <Sidebar />
-            </div>
-            
-            {/* --- MAIN CONTENT AREA --- */}
-            <div className="flex-1 h-full overflow-y-auto overflow-x-hidden p-6 md:p-8 box-border">
-                
-                <div className="max-w-[1400px] mx-auto">
-                
-                    {/* Search & Notification */}
-                    <div className="flex items-center justify-end gap-4 mb-4 mt-2">
-                        <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-600 min-w-[300px] shadow-sm focus-within:border-[#d4a843]">
-                            <span>🔍</span>
-                            <input 
-                                type="text" 
-                                placeholder="Search courses..." 
-                                className="outline-none bg-transparent w-full text-gray-800"
-                                value={searchTerm}                                   // 🌟 Ye add karein
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                {/* 1. Common Search Bar */}
+                <div className="flex items-center justify-end gap-4 mb-4 mt-2">
+                    <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-600 min-w-[300px] shadow-sm focus-within:border-[#d4a843]">
+                        <span>🔍</span>
+                        <input 
+                            type="text" 
+                            placeholder="Search courses..." 
+                            className="outline-none bg-transparent w-full text-gray-800"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <div className="w-12 h-12 rounded-2xl border border-gray-200 bg-white flex items-center justify-center cursor-pointer relative hover:border-[#d4a843]/30 shadow-sm transition-all">
+                        <span className="text-xl">🔔</span>
+                        <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                    </div>
+                </div>
+
+                {/* 🌟 CONDITIONAL RENDERING (Fixed Syntax) 🌟 */}
+                {view === "dashboard" ? (
+                    <>
+                        <div className="bg-white p-8 rounded-[30px] shadow-sm border border-gray-100 mb-8 w-full flex items-center justify-between">
+                            <div>
+                                <h1 className="text-3xl font-sans font-bold text-gray-800 tracking-tight">
+                                    Welcome back, {user?.name || "Learner"}! 👋
+                                </h1>
+                                <p className="text-gray-500 mt-2">
+                                    You have {enrolledCourses.length} active courses.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="mb-10 w-full"><StatCards totalEnrolled={enrolledCourses.length} totalMinutes={totalMinutes} streak={streak}/></div>
+                        <div className="w-full pb-10"><ContinueLearning courses={filteredCourses} /></div>
+                        <div className="w-full pb-10">
+                            <Achievements enrolledCourses={enrolledCourses} /> 
+                            {/* <UpcomingSessions /> */}
+                            
+                        </div>
+                    </>
+                ) : view === "my-courses" ? (
+    /* --- MY COURSES VIEW (Hover Effect Fixed) --- */
+    <div className="animate-fadeIn w-full">
+        <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-bold text-gray-800">My Learning</h2>
+            {searchTerm && (
+                <p className="text-sm text-[#d4a843] font-semibold">
+                    Found {filteredEnrolled.length} results for "{searchTerm}"
+                </p>
+            )}
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredEnrolled.length > 0 ? (
+                filteredEnrolled.map((course) => (
+                    <div 
+                        key={course._id} 
+                        className="bg-white rounded-[25px] p-4 shadow-md border border-gray-100 transition-all duration-300 hover:shadow-2xl hover:-translate-y-2 group cursor-pointer"
+                    >
+                        {/* Image Container with Zoom Effect */}
+                        <div className="overflow-hidden rounded-xl mb-4 h-44 w-full">
+                            <img 
+                                src={course.image || course.thumbnail || "https://placehold.co/400x250"} 
+                                className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" 
+                                alt={course.title} 
                             />
                         </div>
 
-                        <div className="w-12 h-12 rounded-2xl border border-gray-200 bg-white flex items-center justify-center cursor-pointer relative hover:border-[#d4a843]/30 shadow-sm transition-all">
-                            <span className="text-xl">🔔</span>
-                            <span className="absolute top-3 right-3 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white"></span>
-                        </div>
-                    </div>
-                    
+                        {/* Title with color change on hover */}
+                        <h3 className="font-bold text-lg mb-4 group-hover:text-[#d4a843] transition-colors line-clamp-2">
+                            {course.title}
+                        </h3>
 
-                    {/* Welcome Header */}
-                    <div className="bg-white p-8 rounded-[30px] shadow-sm border border-gray-100 mb-8 w-full flex items-center justify-between">
-                        <div>
-                            <h1 className="text-3xl font-bold text-gray-800">
-                                Welcome back, {user?.name || "Learner"}! 👋
-                            </h1>
-                            <p className="text-gray-500 mt-2">
-                                You have {enrolledCourses.length} active {enrolledCourses.length === 1 ? 'course' : 'courses'}.
-                            </p>
-                        </div>
+                        {/* Continue Button */}
+                        <button 
+                            onClick={() => navigate(`/course-player/${course._id}`)} 
+                            className="w-full py-3 bg-[#d4a843] text-white rounded-lg font-bold shadow-lg shadow-[#d4a843]/20 hover:bg-[#b88f32] transition-all"
+                        >
+                            Continue Learning
+                        </button>
                     </div>
-
-                    {/* Stat Cards - Real Enrolled Count */}
-                    <div className="mb-10 w-full">
-                        <StatCards totalEnrolled={enrolledCourses.length} />
-                    </div>
-
-                    {/* Main Content Grid: Continue Learning is now full width if RecentActivity is gone */}
-                    <div className="w-full pb-10">
-                        {/* ✅ Continue Learning pass dynamic courses, it will be full height */}
-                        <ContinueLearning courses={filteredCourses} />
-                    </div>
-
-                    {/* Bottom Row */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full pb-10">
-                        {/* 🌟 enrolledCount prop bheja */}
-                        <Achievements enrolledCount={enrolledCourses.length} /> 
-                        <UpcomingSessions />
-                    </div>
-
+                ))
+            ) : (
+                <div className="col-span-full text-center py-20 text-gray-400">
+                    No courses match your search. 🔍
                 </div>
-            </div>
-            
+            )}
         </div>
-    );
-};
+    </div>
+) : view === "progress" ? (
+                    /* 🌟 DYNAMIC PROGRESS REPORT VIEW 🌟 */
+<div className="animate-fadeIn w-full">
+    <h2 className="text-2xl font-bold mb-8 text-gray-800">Learning Progress</h2>
+    
+    <div className="bg-white p-8 rounded-[35px] shadow-sm border border-gray-100">
+        <h4 className="font-bold mb-6 text-gray-500 uppercase text-xs tracking-widest">Course Performance</h4>
+        
+        <div className="space-y-8">
+            {enrolledCourses.length > 0 ? (
+                enrolledCourses.map((course) => {
+                    // 🌟 Real progress calculate karein (default 0 agar data na ho)
+                    const progressValue = course.progress || 0; 
+                    
+                    return (
+                        <div key={course._id} className="group">
+                            <div className="flex justify-between mb-2 items-end">
+                                <span className="font-bold text-gray-700 group-hover:text-[#d4a843] transition-colors">
+                                    {course.title}
+                                </span>
+                                <span className="text-[#d4a843] font-black text-sm">
+                                    {progressValue}%
+                                </span>
+                            </div>
+                            
+                            {/* Dynamic Progress Bar */}
+                            <div className="w-full bg-gray-100 h-3 rounded-full overflow-hidden shadow-inner">
+                                <div 
+                                    className="bg-gradient-to-r from-[#d4a843] to-[#b88f32] h-full rounded-full transition-all duration-1000 ease-out" 
+                                    style={{ width: `${progressValue}%` }} // 🌟 Yahan magic ho raha hai!
+                                ></div>
+                            </div>
+                        </div>
+                    );
+                })
+            ) : (
+                <p className="text-center text-gray-400 py-10">No enrolled courses found to track progress.</p>
+            )}
+        </div>
+    </div>
+</div>
+
+) : null}
+
+            </div>
+        </div>
+    </div>
+);
+}
 
 export default Dashboard;
 

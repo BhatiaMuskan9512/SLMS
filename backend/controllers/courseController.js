@@ -29,7 +29,7 @@ export const createCourse = async (req, res) => {
 // 2. Get all published courses for Home Page
 export const getPublishedCourses = async (req, res) => {
     try {
-        const courses = await Course.find({ isPublished: true }).populate("lectures").populate("reviews");
+        const courses = await Course.find({ isPublished: true }).populate("lectures").populate("reviews").populate("creator", "name");
 
         if (!courses) {
             return res.status(404).json({ message: "Courses not found" });
@@ -97,7 +97,7 @@ export const getCourseById = async (req, res) => {
     const { courseId } = req.params;
 
     try {
-        const course = await Course.findById(courseId).populate("lectures").populate("reviews");
+        const course = await Course.findById(courseId).populate("lectures").populate("reviews").populate("creator", "name");
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
         }
@@ -152,53 +152,40 @@ export const createLecture = async (req, res) => {
     }
 };
 
-// 8. Get all lectures for a specific course
+// 8. 🌟 UPDATED: Get all lectures with Enrollment Check
 export const getCourseLectures = async (req, res) => {
-    const { courseId } = req.params;
-
     try {
-        const course = await Course.findById(courseId).populate("lectures");
-        if (!course) {
-            return res.status(404).json({ message: "Course not found" });
+        const { courseId } = req.params;
+        const userId = req.userId;
+
+        const user = await User.findById(userId);
+        const isEnrolled = user.enrolledCourses.some(
+            (item) => item.courseId.toString() === courseId
+        );
+
+        if (!isEnrolled) {
+            return res.status(403).json({ success: false, message: "Not Enrolled" });
         }
 
-        return res.status(200).json({ course });
+        // 🌟 Yahan change hai: lectures ko explicitly populate karein
+        const course = await Course.findById(courseId).populate({
+            path: 'lectures',
+            model: 'Lecture' // Ensure karein ki model name sahi hai
+        });
+        
+        console.log("Course with lectures:", course); // Terminal mein check karein lectures dikh rahe hain ya nahi
+
+        return res.status(200).json({ 
+            success: true, 
+            course: course 
+        });
     } catch (error) {
-        return res.status(500).json({ message: `Failed to get course lectures: ${error.message}` });
+        return res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// 9. Edit lecture and upload Video
-// export const editLecture = async (req, res) => {
-//     const { lectureId } = req.params;
-//     const { lectureTitle, isPreviewFree } = req.body;
-
-//     try {
-//         let lecture = await Lecture.findById(lectureId);
-//         if (!lecture) {
-//             return res.status(404).json({ message: "Lecture not found" });
-//         }
-
-//         if (req.file) {
-//             const uploadResult = await uploadOnCloudinary(req.file.path);
-//             lecture.videoUrl = uploadResult?.secure_url;
-//         }
-
-//         if (lectureTitle) lecture.lectureTitle = lectureTitle;
-//         if (isPreviewFree !== undefined) lecture.isPreviewFree = isPreviewFree;
-
-//         await lecture.save();
-
-//         return res.status(200).json(lecture);
-//     } catch (error) {
-//         return res.status(500).json({ message: `Failed to edit lecture: ${error.message}` });
-//     }
-// };
-// backend/controllers/courseController.js mein editLecture function:
-
 export const editLecture = async (req, res) => {
     const { lectureId } = req.params;
-    // Hum body se lectureTitle aur videoUrl (link) dono le rahe hain
     const { lectureTitle, isPreviewFree, videoUrl } = req.body;
 
     try {
@@ -207,12 +194,19 @@ export const editLecture = async (req, res) => {
             return res.status(404).json({ message: "Lecture not found" });
         }
 
-        // 1. Agar koi file upload hui hai (Cloudinary), toh URL update karein
+        // 1. Agar koi file upload hui hai (Cloudinary)
         if (req.file) {
             const uploadResult = await uploadOnCloudinary(req.file.path);
             lecture.videoUrl = uploadResult?.secure_url;
+
+            // 👇 NAYA LOGIC: Cloudinary se duration (seconds mein) milti hai
+            // Hum use minutes mein convert karke save kar rahe hain
+            if (uploadResult && uploadResult.duration) {
+                lecture.duration = Math.round(uploadResult.duration / 60);
+                console.log("Lecture duration saved:", lecture.duration, "mins");
+            }
         } 
-        // 2. Agar file nahi hai par direct LINK (videoUrl) bheja hai, toh usey save karein
+        // 2. Agar direct LINK bheja hai
         else if (videoUrl) {
             lecture.videoUrl = videoUrl;
         }
@@ -227,7 +221,6 @@ export const editLecture = async (req, res) => {
         return res.status(500).json({ message: `Failed to edit lecture: ${error.message}` });
     }
 };
-
 
 // 10. Remove a lecture from a course and DB
 export const removeLecture = async (req, res) => {
@@ -269,12 +262,12 @@ export const getCreatorById = async (req, res) => {
 
 };
 
+// 12. 🌟 UPDATED ENROLL IN COURSE (Fixed Validation Error)
 export const enrollInCourse = async (req, res) => {
     try {
         const courseId = req.params.courseId;
-        const userId = req.userId; // Ye aapke auth middleware (jaise isAuth) se aana chahiye
+        const userId = req.userId;
 
-        // User aur Course ko find karein
         const user = await User.findById(userId);
         const course = await Course.findById(courseId);
 
@@ -282,18 +275,28 @@ export const enrollInCourse = async (req, res) => {
             return res.status(404).json({ message: "User or Course not found" });
         }
 
-        // Check karein ki kya user pehle se enrolled toh nahi hai
-        if (course.enrolledStudents.includes(userId)) {
+        // 🌟 Check karein naye Object format ke mutabiq
+        const isAlreadyEnrolled = user.enrolledCourses.some(
+            (item) => item.courseId?.toString() === courseId
+        );
+
+        if (isAlreadyEnrolled) {
             return res.status(400).json({ message: "You are already enrolled in this course!" });
         }
 
-        // Course ke andar student ki ID save karein
-        course.enrolledStudents.push(userId);
-        await course.save();
-
-        // User ke andar course ki ID save karein
-        user.enrolledCourses.push(courseId);
+        // ✅ Step A: NAYE SCHEMA KE MUTABIQ OBJECT PUSH KAREIN
+        user.enrolledCourses.push({
+            courseId: courseId, // 👈 Ye 'courseId' name schema se match hona chahiye
+            completedLectures: [],
+            courseProgress: 0
+        });
         await user.save();
+
+        // Step B: Course model update
+        if (!course.enrolledStudents.includes(userId)) {
+            course.enrolledStudents.push(userId);
+            await course.save();
+        }
 
         return res.status(200).json({ message: "🎉 Successfully Enrolled!" });
 
@@ -302,18 +305,154 @@ export const enrollInCourse = async (req, res) => {
     }
 };
 
+// 13. 🌟 UPDATED GET ENROLLED COURSES (Fixed Dashboard View)
 export const getEnrolledCourses = async (req, res) => {
     try {
-        // Hum user ko uske 'enrolledCourses' ke data ke saath fetch karenge
-        const user = await User.findById(req.userId).populate('enrolledCourses');
+        // Deep populate courseId taaki title/thumbnail mil sakein
+        const user = await User.findById(req.userId).populate({
+            path: 'enrolledCourses.courseId',
+            model: 'Course',
+            populate: {
+                path: 'creator',
+                select: 'name'
+            }
+        });
         
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // Sirf courses ka array bhej denge
-        return res.status(200).json(user.enrolledCourses);
+        // Data ko "Flatten" karna taaki Frontend ko title/image purane tarike se mile
+        const formattedCourses = user.enrolledCourses.map(item => {
+            if (!item.courseId) return null;
+            return {
+                ...item.courseId._doc,
+                progress: item.courseProgress || 0,
+                completedLectures: item.completedLectures || []
+            };
+        }).filter(Boolean);
+
+        return res.status(200).json(formattedCourses);
     } catch (error) {
         return res.status(500).json({ message: `Failed to fetch enrolled courses: ${error.message}` });
+    }
+};
+
+// Progress Update karne ka Controller
+export const updateLectureProgress = async (req, res) => {
+    try {
+        const { courseId, lectureId } = req.body;
+        const userId = req.userId;
+
+        const user = await User.findById(userId).populate('enrolledCourses.courseId');
+        const enrolledCourse = user.enrolledCourses.find(c => c.courseId._id.toString() === courseId);
+
+        // 1. Pehle minutes add karein (Har baar jab video khatam ho)
+        const lecture = await Lecture.findById(lectureId);
+        if (lecture && lecture.duration) {
+            // Number() conversion zaroori hai
+            user.totalMinutesLearned = (Number(user.totalMinutesLearned) || 0) + Number(lecture.duration);
+            console.log("Added Minutes:", lecture.duration);
+        }
+
+        // 2. Phir completedLectures update karein (sirf ek baar add hoga array mein)
+        if (!enrolledCourse.completedLectures.includes(lectureId)) {
+            enrolledCourse.completedLectures.push(lectureId);
+        }
+
+        // 3. Progress calculate karein
+        const totalLectures = enrolledCourse.courseId.lectures.length;
+        enrolledCourse.courseProgress = Math.round((enrolledCourse.completedLectures.length / totalLectures) * 100);
+
+        // updateLectureProgress function ke andar ye logic add karein:
+    
+// Date ko "YYYY-MM-DD" format mein lene ka sabse sahi tarika
+const todayStr = new Date().toLocaleDateString('en-CA'); // Result: "2026-04-11"
+const today = new Date(todayStr);
+
+if (user.lastLectureDate) {
+    const lastDateStr = new Date(user.lastLectureDate).toLocaleDateString('en-CA');
+    const lastDate = new Date(lastDateStr);
+
+    const diffInTime = today.getTime() - lastDate.getTime();
+    const diffInDays = Math.round(diffInTime / (1000 * 3600 * 24));
+
+    console.log("Date Check - Today:", todayStr, "Last:", lastDateStr, "Diff:", diffInDays);
+
+    if (diffInDays === 1) {
+        user.streakCount += 1;
+    } else if (diffInDays > 1) {
+        user.streakCount = 1;
+    }
+    // diffInDays 0 hai toh kuch nahi badhega
+} else {
+    user.streakCount = 1;
+}
+
+user.lastLectureDate = today; 
+await user.save();
+
+// 🚩 YE LINE SABSE IMPORTANT HAI:
+// Ise IF-ELSE ke bahar rakhein taaki aaj ki date hamesha save ho jaye.
+user.lastLectureDate = today;
+        // 4. FINAL SAVE (Sirf ek baar)
+        await user.save();
+        
+        res.status(200).json({ 
+            success: true,
+            progress: enrolledCourse.courseProgress,
+            totalMinutes: user.totalMinutesLearned,
+            streak: user.streakCount 
+        });
+    } catch (error) {
+        console.error("Progress Error:", error.message);
+        res.status(500).json({ message: error.message });
+    }
+};
+// courseController.js
+export const getCourseCount = async (req, res) => {
+    try{
+        // 1. Total count nikalenge
+        const count = await Course.countDocuments();
+
+
+        // 2. Saare courses ke sirf title aur id mangwayenge dropdown ke liye
+        const courses = await Course.find({}, "title");
+        return res.status(200).json({
+            success: true,
+            count: count,
+            courses: courses
+        });
+    } catch(error){
+        return res.status(500).json({success: false, message: error.message});
+    }
+};
+
+
+// courseController.js
+export const getCourseCategoryStats = async (req, res) => {
+    try {
+        // MongoDB aggregation ka use karke category wise count nikalenge
+        const stats = await Course.aggregate([
+            {
+                $group: {
+                    _id: "$category", // Aapke Course model mein jo category field hai
+                    count: { $sum: 1 }
+                }
+            }
+        ]);
+
+        // Data ko frontend ke format mein convert karein
+        const formattedStats = stats.map(item => ({
+            name: item._id || "Uncategorized",
+            value: item.count
+        }));
+
+        return res.status(200).json({
+            success: true,
+            stats: formattedStats
+        });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: error.message });
     }
 };

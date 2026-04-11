@@ -158,6 +158,7 @@ axios.defaults.baseURL = "http://localhost:8000";
 axios.defaults.withCredentials=true;
 // --- Redux Actions ---
 import { setUser, setIsAuthenticated, setLoading } from './redux/authSlice';
+import Dashboard from './pages/Admin/Dashboard';
 
 // 🌟 SMART FOOTER LOGIC
 const SmartFooter = () => {
@@ -232,32 +233,33 @@ const App = () => {
     );
     
     return (
-    <BrowserRouter>
-        <Toaster position="top-center" reverseOrder={false} />
-        
-        <SmartNavbar />
-       
-        <SmartMain>
-            <Routes>
-                {/* --- Public Routes --- */}
-                <Route path="/" 
-                    element={ isAuthenticated ? (
-                    user?.role === 'student' ? 
-                    <Navigate to="/student/dashboard" /> 
-                    : <Navigate to="/educator/dashboard"/>): <Home />} />
-                <Route path="/login"
-                    element={isAuthenticated  ? (
-                         user?.role === 'student' ? 
-                         <Navigate to="/student/dashboard" /> 
-                    : <Navigate to="/educator/dashboard"/>): <Login />} />
-               
-                <Route path="/student/dashboard" element={<SDashboard />} />
-                <Route path="/educator/dashboard" element={<EDashboard />} />
-                
-                <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/" />} />
-                <Route path="/forget-password" element={<ForgetPassword />} />
-                <Route path="/verify-otp" element={<VerifyOTP />} />
-                <Route path="/reset-password" element={<ResetPassword />} />
+        <BrowserRouter>
+            <Toaster position="top-center" reverseOrder={false} />
+            
+            <Navbar />
+           
+            <SmartMain className="pt-[80px] min-h-screen">
+                <Routes>
+                    {/* --- Public Routes --- */}
+                    <Route path="/" 
+                        element={ isAuthenticated ? (
+                        user?.role === 'student' ? 
+                        <Navigate to="/student/dashboard" /> 
+                        : <Navigate to="/educator/dashboard"/>): <Home />} />
+                    <Route path="/login"
+                        element={isAuthenticated  ? (
+                             user?.role === 'student' ? 
+                             <Navigate to="/student/dashboard" /> 
+                        : <Navigate to="/educator/dashboard"/>): <Login />} />
+                   
+                    <Route path="/student/dashboard" element={<SDashboard />} />
+                    <Route path="/educator/dashboard" element={<EDashboard />} />
+                    
+                    <Route path="/admin/dashboard" element={<Dashboard/>}/>
+                    <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/" />} />
+                    <Route path="/forget-password" element={<ForgetPassword />} />
+                    <Route path="/verify-otp" element={<VerifyOTP />} />
+                    <Route path="/reset-password" element={<ResetPassword />} />
 
                 {/* --- Course Explorer Routes --- */}
                 <Route path="/all-courses" element={<AllCourses />} />
@@ -280,7 +282,7 @@ const App = () => {
                 <Route path="/educator/edit-lecture/:lectureId" element={user?.role === 'educator' ? <EditLecture /> : <Navigate to="/" />} />
                 <Route path="/educator/students" element={user?.role === 'educator' ? <Students /> : <Navigate to="/" />} />
             </Routes>
-        </SmartMain>
+        /</SmartMain>
           
        <SmartFooter />
     </BrowserRouter>

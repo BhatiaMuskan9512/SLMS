@@ -30,7 +30,7 @@
     letter-spacing: -1.5px;
     display: flex;
     align-items: center;
-    border-b: 1px solid rgba(255, 255, 255, 0.03); 
+    border: 1px solid rgba(255, 255, 255, 0.03); 
 }
 
 .brand-yellow {
@@ -60,7 +60,7 @@
     font-weight: 700;
     color: rgba(255, 255, 255, 0.3);
     text-transform: uppercase;
-    tracking-widest: 1.5px;
+    /* tracking-widest: 1.5px; */
 }
 
 /* INDIVIDUAL NAV ITEM */
