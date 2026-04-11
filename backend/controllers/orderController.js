@@ -41,36 +41,53 @@ export const razorpayOrder = async (req, res) => {
 };
 
 // --- 2. VERIFY PAYMENT & ENROLL USER ---
+// --- 2. VERIFY PAYMENT & ENROLL USER ---
 export const verifyPayment = async (req, res) => {
     const { courseId, userId, razorpay_order_id } = req.body;
 
     try {
-        // Fetch order info from Razorpay using the order ID
         const orderInfo = await razorpayInstance.orders.fetch(razorpay_order_id);
 
-        // Check if the order status is 'paid'
         if (orderInfo.status === "paid") {
             
-            // Step A: Update User's Enrolled Courses
+            // Step A: Update User's Enrolled Courses (Updated for Progress Tracking)
             const user = await User.findById(userId);
-            if (user && !user.enrolledCourses.includes(courseId)) {
-                user.enrolledCourses.push(courseId);
-                await user.save();
+            
+            if (user) {
+                // 🌟 Naya format check: Kya user pehle se enroll hai?
+                const isAlreadyEnrolled = user.enrolledCourses.some(
+                    (item) => item.courseId.toString() === courseId
+                );
+
+                if (!isAlreadyEnrolled) {
+                    // ✅ Naye schema ke mutabiq object push karein
+                    user.enrolledCourses.push({
+                        courseId: courseId,
+                        completedLectures: [],
+                        courseProgress: 0 // Default progress 0%
+                    });
+                    await user.save();
+                }
             }
 
-            // Step B: Update Course's Enrolled Students
-            const course = await Course.findById(courseId).populate("lectures");
-            if (course && !course.enrolledStudents.includes(userId)) {
-                course.enrolledStudents.push(userId);
-                await course.save();
-            }
+            // Step B: Update Course's Enrolled Students (Wahi rahega)
+           // Step B: Update Course's Enrolled Students
+                const course = await Course.findById(courseId);
+                if (course) {
+                    // 🌟 Check karein ki user ID pehle se list mein hai ya nahi
+                    const studentExists = course.enrolledStudents.includes(userId);
+                    
+                    if (!studentExists) {
+                        course.enrolledStudents.push(userId);
+                        await course.save();
+                    }
+                }
 
             return res.status(200).json({ 
-                message: "Payment verified and enrollment successfully" 
+                message: "Payment verified and enrollment successful" 
             });
 
         } else {
-            // If the status is not 'paid'
             return res.status(400).json({ message: "Payment failed" });
         }
 

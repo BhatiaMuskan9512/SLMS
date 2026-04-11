@@ -12,7 +12,8 @@ import {
     removeLecture,
     getCreatorById,
     enrollInCourse,
-    getEnrolledCourses
+    getEnrolledCourses,
+    updateLectureProgress
 } from "../controllers/courseController.js";
 import isAuth from "../middleware/isAuth.js";
 import upload from "../middleware/multer.js";
@@ -33,6 +34,8 @@ courseRouter.get("/get-creator", isAuth, getCreatorCourses);
 // Edit course details and upload thumbnail (Protected + Multer)
 courseRouter.post("/edit-course/:courseId", isAuth, upload.single("thumbnail"), editCourse);
 
+courseRouter.post("/update-progress", isAuth, updateLectureProgress);
+
 // Get single course details by ID (Protected)
 courseRouter.get("/get-course/:courseId", isAuth, getCourseById);
 
@@ -47,6 +50,7 @@ courseRouter.post("/:courseId/enroll", isAuth, enrollInCourse); // <-- 2. YAHAN 
 
 // Get enrolled courses for the student dashboard
 courseRouter.get("/my-courses", isAuth, getEnrolledCourses);
+
 
 
 // --- FOR LECTURES ---

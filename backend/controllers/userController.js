@@ -4,22 +4,39 @@ import uploadOnCloudinary from "../config/cloudinary.js";
 // --- 1. GET CURRENT LOGGED-IN USER ---
 export const getCurrentUser = async (req, res) => {
     try {
-        // The userId is provided by the isAuth middleware
+        // Step A: Deep Populate courseId taaki course ke details mil sakein
         const user = await User.findById(req.userId)
-            .select("-password") // Exclude password for security
-            .populate("enrolledCourses"); // Populate course details for the 'My Courses' section
+            .select("-password")
+            .populate({
+                path: 'enrolledCourses.courseId', // 🌟 Naye structure ke hisaab se populate
+                model: 'Course'
+            });
 
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        return res.status(200).json({
-            success:true,
-            user: {
-                name : user.name,
-                email : user.email,
-                enrolledCourses: user.enrolledCourses || []
+        // Step B: Data ko "Flatten" karna taaki Frontend ko "toLowerCase" error na mile
+        const formattedCourses = user.enrolledCourses.map(item => {
+            if (!item.courseId) return null; // Safety check
+            
+            return {
+                ...item.courseId._doc, // Course ke saare details (title, image, etc.)
+                progress: item.courseProgress || 0, // 🌟 Dynamic Progress value
+                completedLectures: item.completedLectures || []
+            };
+        }).filter(Boolean); // Invalid data ko remove karne ke liye
 
+        return res.status(200).json({
+            success: true,
+            user: {
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                photoUrl: user.photoUrl,
+                totalMinutesLearned: user.totalMinutesLearned,
+                streakCount: user.streakCount || 0,
+                enrolledCourses: formattedCourses // 🌟 Ab ye Dashboard ke liye ready hai
             }
         });
 

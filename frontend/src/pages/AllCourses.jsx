@@ -29,6 +29,7 @@ const AllCourses = () => {
                         { prompt: query },
                         { withCredentials: true }
                     );
+                    console.log("ALL COURSES DATA:", response.data);
                     setFilteredCourses(response.data);
                 } catch (error) {
                     console.error("AI Search failed:", error);
@@ -126,6 +127,7 @@ const AllCourses = () => {
                 ) : filteredCourses && filteredCourses.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {filteredCourses.map((course) => {
+                            console.log("COURSE DEBUG:", course.title, " | Creator Field:", course.creator);
                             const isFree = !course.price || course.price === 0;
 
                             return (
@@ -164,7 +166,9 @@ const AllCourses = () => {
                                         </h3>
                                         
                                         <p className="text-sm text-gray-500 mb-4 flex-1 line-clamp-1">
-                                            by <span className="font-medium text-gray-700">{course.instructor || "Expert Instructor"}</span>
+                                            by <span className="font-medium text-gray-700">{course.creator && typeof course.creator === 'object' 
+            ? course.creator.name 
+            : "Expert Instructor"}</span>
                                         </p>
 
                                         <div className="flex items-center gap-1.5 mb-5">

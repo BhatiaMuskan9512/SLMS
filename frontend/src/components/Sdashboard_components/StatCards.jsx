@@ -2,39 +2,54 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const StatCards = ({ totalEnrolled }) => {
+const StatCards = ({ totalEnrolled, totalMinutes, streak }) => {
     const navigate = useNavigate();
-    // ✅ Real-time data from Dashboard.jsx
+
+    // Time calculation
+    const hours = Math.floor((totalMinutes || 0) / 60);
+    const mins = (totalMinutes || 0) % 60;
+    const timeDisplay = `${hours}h ${mins}m`;
+
     const statsData = [
         {
             id: 1,
             icon: "📚",
-            iconBg: "bg-[#3ECFC6]/15", // Teal background
+            iconBg: "bg-[#3ECFC6]/15",
             badgeText: "+1 new",
             badgeStyle: "bg-green-50 text-green-700", 
             value: totalEnrolled || "0", 
             label: "Courses Enrolled"
         },
-        // Baaki cards baad mein real banenge jab models ready ho
-        { id: 2, icon: "⏱️", iconBg: "bg-[#d4a843]/15", badgeText: "↑ 12%", badgeStyle: "bg-gray-50 text-gray-600", value: "38", label: "Hours Learned" },
-        { id: 3, icon: "🏆", iconBg: "bg-blue-50", badgeText: "New!", badgeStyle: "bg-gray-50 text-gray-600", value: "2", label: "Certificates Earned" },
-        { id: 4, icon: "🔥", iconBg: "bg-coral-50", badgeText: "On fire!", badgeStyle: "bg-gray-50 text-gray-600", value: "7", label: "Day Streak" }
+        { 
+            id: 2, 
+            icon: "⏱️", 
+            iconBg: "bg-[#d4a843]/15", 
+            badgeText: "Learning Time", 
+            badgeStyle: "bg-amber-50 text-amber-700", 
+            value: timeDisplay, // ✅ Real dynamic value
+            label: "Hours Learned" 
+        },
+        // { id: 3, icon: "🏆", iconBg: "bg-blue-50", badgeText: "New!", badgeStyle: "bg-blue-50 text-blue-600", value: "2", label: "Certificates Earned" },
+        { id: 4, 
+    icon: "🔥", 
+    iconBg: "bg-orange-50", 
+    badgeText: "On fire!", 
+    badgeStyle: "bg-red-50 text-red-600", 
+    value: streak || "0", // 👈 Agar streak na ho toh 0 dikhaye
+    label: "Day Streak"}
     ];
 
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[30px]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[30px]">
             {statsData.map((stat) => (
                 <div 
                     key={stat.id} 
-                    // 🌟 3. Card click logic: Agar Courses Enrolled wala card (id 1) hai toh navigate karein
                     onClick={() => stat.id === 1 && navigate('/my-courses')}
-                    
                     className={`bg-white rounded-[24px] p-8 border border-gray-100 shadow-sm transition-all duration-300 
                                hover:scale-[1.02] hover:bg-[#FFFDF5] hover:border-[#d4a843]/20 
                                hover:shadow-[0_15px_40px_rgba(0,0,0,0.03)] 
-                               ${stat.id === 1 ? 'cursor-pointer' : 'cursor-default'}`} // ✅ Pointer sirf usi card pe aayega
+                               ${stat.id === 1 ? 'cursor-pointer' : 'cursor-default'}`}
                 >
-                    {/* Top Section */}
                     <div className="flex items-center justify-between mb-5">
                         <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl ${stat.iconBg}`}>
                             {stat.icon}
@@ -44,8 +59,7 @@ const StatCards = ({ totalEnrolled }) => {
                         </span>
                     </div>
 
-                    {/* Bottom Section */}
-                    <div className="font-['Cormorant_Garamond'] text-[36px] font-bold text-[#0a0b0f] leading-none">
+                    <div className="text-[34px] font-extrabold text-[#0a0b0f] leading-none tracking-tight">
                         {stat.value}
                     </div>
                     <div className="text-xs text-gray-400 mt-2 tracking-wide font-medium">
