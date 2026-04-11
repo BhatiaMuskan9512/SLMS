@@ -13,12 +13,9 @@ import {
     getCreatorById,
     enrollInCourse,
     getEnrolledCourses,
-<<<<<<< HEAD
-    updateLectureProgress
-=======
+    updateLectureProgress,
     getCourseCount,
     getCourseCategoryStats
->>>>>>> 6b0653c93577cfa22bf3c835d3a11417135ef1fe
 } from "../controllers/courseController.js";
 import isAuth from "../middleware/isAuth.js";
 import upload from "../middleware/multer.js";
