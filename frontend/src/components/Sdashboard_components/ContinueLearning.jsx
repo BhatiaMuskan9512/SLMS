@@ -9,7 +9,7 @@ const ContinueLearning = ({ courses }) => {
         <div className="bg-white p-8 rounded-[30px] shadow-sm border border-gray-100 w-full min-h-[350px]">
             {/* Header Section */}
             <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl font-bold text-gray-800">Continue Learning</h2>
+                <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Continue Learning</h2>
                 <span 
                     onClick={() => navigate('/my-courses')} 
                     className="text-sm font-bold text-[#d4a843] cursor-pointer hover:underline tracking-wide transition-all"
@@ -41,15 +41,14 @@ const ContinueLearning = ({ courses }) => {
                                         className="w-full h-full rounded-2xl object-cover shadow-sm group-hover:scale-105 transition-transform duration-300"
                                     />
                                     {/* Subtle Indicator on Hover */}
-                                    <span className="absolute top-2 right-2 bg-[#d4a843] text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold opacity-0 group-hover:opacity-100 transition-opacity">
-                                        ACTIVE
-                                    </span>
+                                    {/* <span className="absolute top-2 right-2 bg-[#d4a843] text-white text-[9px] px-1.5 py-0.5 rounded-full font-bold opacity-0 group-hover:opacity-100 transition-opacity">
+                                    </span> */}
                                 </div>
 
                                 {/* Course Information */}
                                 <div className="flex-1">
                                     <div className="flex justify-between items-start">
-                                        <h4 className="font-bold text-lg text-gray-800 group-hover:text-[#d4a843] transition-colors line-clamp-1 font-serif">
+                                        <h4 className="font-bold text-lg text-gray-800 transition-colors line-clamp-1 group-hover:text-[#d4a843]">
                                             {course.title}
                                         </h4>
                                         <span className="text-[10px] font-bold text-gray-400 ml-2 bg-white px-2 py-1 rounded-lg border border-gray-100 shadow-xs">

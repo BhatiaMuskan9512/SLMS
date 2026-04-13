@@ -29,6 +29,7 @@ const AllCourses = () => {
                         { prompt: query },
                         { withCredentials: true }
                     );
+                    console.log("ALL COURSES DATA:", response.data);
                     setFilteredCourses(response.data);
                 } catch (error) {
                     console.error("AI Search failed:", error);
@@ -96,6 +97,15 @@ const AllCourses = () => {
             <div className="max-w-[1400px] mx-auto mb-12">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
+                        
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="flex items-center gap-2 text-gray-500 hover:text-[#d4a843] transition-colors mb-4 group"
+                        >
+                            <span className="text-xl group-hover:-translate-x-1 transition-transform">←</span>
+                            <span className="font-medium text-sm">Back</span>
+                        </button>
+
                         <h1 className="text-3xl md:text-4xl font-extrabold text-[#0a0b0f] tracking-tight">
                             {aiActive ? `AI Results for: "${query}"` : "Browse All Courses"}
                         </h1>
@@ -126,13 +136,14 @@ const AllCourses = () => {
                 ) : filteredCourses && filteredCourses.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                         {filteredCourses.map((course) => {
+                            console.log("COURSE DEBUG:", course.title, " | Creator Field:", course.creator);
                             const isFree = !course.price || course.price === 0;
 
                             return (
                                 <div 
                                     key={course._id} 
                                     className="bg-white rounded-[24px] overflow-hidden border border-black/5 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col group cursor-pointer"
-                                    onClick={() => navigate(`/course-view/${course._id}`)}
+                                    onClick={() => navigate(`/course-detail/${course._id}`)}
                                 >
                                     <div className="relative h-48 w-full bg-gray-100 overflow-hidden">
                                         {course.thumbnail ? (
@@ -164,7 +175,9 @@ const AllCourses = () => {
                                         </h3>
                                         
                                         <p className="text-sm text-gray-500 mb-4 flex-1 line-clamp-1">
-                                            by <span className="font-medium text-gray-700">{course.instructor || "Expert Instructor"}</span>
+                                            by <span className="font-medium text-gray-700">{course.creator && typeof course.creator === 'object' 
+            ? course.creator.name 
+            : "Expert Instructor"}</span>
                                         </p>
 
                                         <div className="flex items-center gap-1.5 mb-5">

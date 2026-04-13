@@ -174,7 +174,7 @@ const CourseManagement = () => {
   const Categories = ["All categories", ...new Set(courses.map(course => course.category || "Uncategorized"))];
   const [selectedCategory, setSelectedCategory] = useState("All categories");
 
-  const[selectedCourseId, setSelectedCourseID] = useState(null);
+  const[selectedCourseId, setSelectedCourseId] = useState(null);
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -269,7 +269,7 @@ const CourseManagement = () => {
           <select 
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="bg-[#F9F6EE] border border-[#E8E1CD] rounded-xl px-4 py-2.5 text-sm font-black text-[#5C5C5C] outline-none cursor-pointer"
+            className="bg-[#F9F6EE] border border-[#E8E1CD] rounded-xl px-4 py-2.5 text-sm font-black text-[#1A1A1A] outline-none cursor-pointer"
           >
             {Categories.map((category, index) => (
               <option key={index} value={category}>

@@ -170,105 +170,133 @@ const DashboardContent = () => {
 
       
       
-        {/* 🌟 3. NEW SECTION: COURSE STATISTICS (Donut Chart) */}
-       {/* 2. 🌟 Separate Charts Section */}
-      <div className="dashboard-grid-main mb-9">
-        
-        {/* Card 1: Course Categories (Doughnut) - Compact Layout */}
-        <div className="chart-box" style={{ maxWidth: '480px', padding: '20px' }}> 
-          <h3 className="font-bold text-gray-800 mb-8 text-base">Course Categories</h3>
-          
-          {/* 🌟 Flex container chart aur labels ko baju mein karne ke liye */}
-          <div className="flex items-center gap-4">
-            
-            {/* Left side: Chart */}
-            <div className="h-[200px] w-[220px] relative">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie 
-                    data={dynamicPieData.length>0 ? dynamicPieData: [{name: 'Empty', value: 1, color: '#f3f4f'}]} 
-                    innerRadius={50} 
-                    outerRadius={70} 
-                    paddingAngle={5} 
-                    dataKey="value"
-                  >
-                    {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* Right side: Labels List */}
-            <div className="flex flex-col gap-4" w-full>
-              {dynamicPieData.length > 0 ? dynamicPieData.map((entry, index) => (
-                <div key={index} className="flex items-center w-full gap-2">
-                  <div className="flex items-center gap-2">
-                  <span className="w-3.8 h-3.5 rounded-full" style={{backgroundColor: entry.color}}></span> 
-                  <span className="text-[15px] font-bold text-gray-600 uppercase tracking-tight">
-                    {entry.name}
-                  </span>
-                  </div>
-                </div>
-              )) : <p className="text-gray-400 text-sm italic">No Categories Found</p>}
-            </div>
-          </div>
-        </div>
-
-        {/* Card 2: Weekly Activity (Bar Chart) */}
-        <div className="chart-box" 
-          style={{ 
-            backgroundColor: 'white', 
-            padding: '24px', 
-            borderRadius: '24px', 
-            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-            border: '1px solid #f0f0f0',
-            flex: 1, 
-            minWidth: '400px',
-            marginTop: '20px'
-          }}>
-        
-        <div className="flex justify-between items-center mb-6">
-          <div>
-            <h3 className="font-bold text-gray-800 text-lg">Weekly Student Activity</h3>
-            <p className="text-xs text-gray-400">New registrations per day</p>
-          </div>
-        </div>
-
-        <div style={{ height: '240px', width: '100%' }}>
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={dynamicBarData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f5f5f5" />
-              <XAxis 
-                dataKey="day" 
-                axisLine={false} 
-                tickLine={false} 
-                tick={{fontSize: 12, fill: '#9CA3AF'}} 
-                dy={10}
-              />
-              <YAxis hide />
-              <Tooltip 
-                cursor={{fill: '#F9F6EE'}} 
-                contentStyle={{borderRadius: '10px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)'}}
-              />
-              <Bar 
-                dataKey="value" 
-                fill="#D4A843" 
-                radius={[6, 6, 0, 0]} 
-                barSize={30} 
-              />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        {/* Charts Section */}
+<div className="flex flex-row gap-6 mb-9 w-full">
+  
+  {/* Card 1: Course Categories (Donut Chart) */}
+  <div style={{
+    backgroundColor: 'white',
+    padding: '24px',
+    borderRadius: '24px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+    border: '1px solid #f0f0f0',
+    flex: '0 0 420px',  // Fixed width
+  }}>
+    <h3 className="font-bold text-gray-800 mb-6 text-base">
+      Course Categories
+    </h3>
+    
+    <div className="flex items-center gap-6">
+      
+      {/* Left — Donut Chart */}
+      <div style={{ height: '200px', width: '200px', flexShrink: 0 }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={dynamicPieData.length > 0 
+                ? dynamicPieData 
+                : [{ name: 'Empty', value: 1, color: '#f3f4f6' }]}
+              innerRadius={55}
+              outerRadius={80}
+              paddingAngle={4}
+              dataKey="value"
+            >
+              {(dynamicPieData.length > 0 
+                ? dynamicPieData 
+                : [{ color: '#f3f4f6' }]
+              ).map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
+            <Tooltip />
+          </PieChart>
+        </ResponsiveContainer>
       </div>
 
+      {/* Right — Labels */}
+      <div className="flex flex-col gap-3 flex-1">
+        {dynamicPieData.length > 0 ? (
+          dynamicPieData.map((entry, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <span
+                style={{
+                  backgroundColor: entry.color,
+                  width: '10px',
+                  height: '10px',
+                  borderRadius: '50%',
+                  flexShrink: 0
+                }}
+              />
+              <span className="text-xs font-bold text-gray-600 uppercase tracking-wide">
+                {entry.name}
+              </span>
+            </div>
+          ))
+        ) : (
+          <p className="text-gray-400 text-sm italic">No Categories</p>
+        )}
       </div>
+    </div>
+  </div>
 
+  {/* Card 2: Weekly Activity (Bar Chart) */}
+  <div style={{
+    backgroundColor: 'white',
+    padding: '24px',
+    borderRadius: '24px',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+    border: '1px solid #f0f0f0',
+    flex: 1,  // Remaining space le lega
+    minWidth: 0,  // Overflow rokne ke liye
+  }}>
+    
+    <div className="flex justify-between items-center mb-6">
+      <div>
+        <h3 className="font-bold text-gray-800 text-lg">
+          Weekly Student Activity
+        </h3>
+        <p className="text-xs text-gray-400">New registrations per day</p>
+      </div>
+    </div>
 
-      {/* 3. NICHE KE DONO GRAPHS (Wapas add kar diye hain) */}
-      <div className="dashboard-main-layout">
+    <div style={{ height: '200px', width: '100%' }}>
+      <ResponsiveContainer width="100%" height="100%">
+        <BarChart data={dynamicBarData}>
+          <CartesianGrid 
+            strokeDasharray="3 3" 
+            vertical={false} 
+            stroke="#f5f5f5" 
+          />
+          <XAxis
+            dataKey="day"
+            axisLine={false}
+            tickLine={false}
+            tick={{ fontSize: 12, fill: '#9CA3AF' }}
+            dy={10}
+          />
+          <YAxis hide />
+          <Tooltip
+            cursor={{ fill: '#F9F6EE' }}
+            contentStyle={{
+              borderRadius: '10px',
+              border: 'none',
+              boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
+            }}
+          />
+          <Bar
+            dataKey="value"
+            fill="#D4A843"
+            radius={[6, 6, 0, 0]}
+            barSize={30}
+          />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  </div>
+
+</div>
+
+      
         
         {/* Left: Earnings Area Chart */}
         {/* <div className="lms-card-main chart-box">
@@ -296,7 +324,7 @@ const DashboardContent = () => {
         </div> */}
 
         {/* Right: Recent Registrations List */}
-        <div className="lms-card-main registration-box">
+        {/* <div className="lms-card-main registration-box">
           <div className="card-header-box">
             <h3>Recent Registrations</h3>
           </div>
@@ -317,10 +345,9 @@ const DashboardContent = () => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
         
 
-      </div>
     </div>
     
   );

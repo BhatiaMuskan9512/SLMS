@@ -79,7 +79,7 @@ const Login = () => {
                 
                 {/* --- Header --- */}
                 <div className="flex flex-col items-center mb-10 text-center">
-                    <div className="w-16 h-16 bg-black text-white rounded-2xl flex items-center justify-center text-3xl mb-4 shadow-lg">
+                    <div className="w-16 h-16 bg-[#d4a843] text-[#1a1a1a] rounded-2xl flex items-center justify-center text-3xl mb-4 shadow-lg">
                         <BiLogInCircle />
                     </div>
                     <h1 className="text-2xl font-bold text-gray-800">Login to Account</h1>
@@ -97,7 +97,7 @@ const Login = () => {
                                 type="email" 
                                 name="email"
                                 placeholder="name@example.com"
-                                className="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-black transition-all"
+                                className="w-full pl-12 pr-12 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-[#d4a843] focus:ring-2 focus:ring-[#d4a843]/20 transition-all"
                                 value={formData.email}
                                 onChange={handleChange}
                                 required
@@ -110,7 +110,7 @@ const Login = () => {
                     <div className="space-y-2">
                         <div className="flex justify-between items-center ml-1">
                             <label className="text-xs font-bold text-gray-500 uppercase tracking-widest">Password</label>
-                            <Link to="/forget-password" name="email" className="text-xs text-blue-600 hover:underline font-semibold">Forgot Password?</Link>
+                            <Link to="/forget-password" name="email" className="text-xs text-[#d4a843] hover:text-[#b88f32] hover:underline font-semibold">Forgot Password?</Link>
                         </div>
                         <div className="relative">
                             <BiLockAlt className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
@@ -118,7 +118,7 @@ const Login = () => {
                                 type={showPassword ? "text" : "password"} 
                                 name="password"
                                 placeholder="••••••••"
-                                className="w-full pl-12 pr-12 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-black transition-all"
+                                className="w-full pl-12 pr-12 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-[#d4a843] focus:ring-2 focus:ring-[#d4a843]/20 transition-all"
                                 value={formData.password}
                                 onChange={handleChange}
                                 required
@@ -127,7 +127,7 @@ const Login = () => {
                             <button 
                                 type="button"
                                 onClick={() => setShowPassword(!showPassword)}
-                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black transition-colors"
+                                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#d4a843] transition-colors"
                             >
                                 {showPassword ? <BiHide size={20} /> : <BiShow size={20} />}
                             </button>
@@ -138,8 +138,8 @@ const Login = () => {
                     <button 
                         type="submit"
                         disabled={loading}
-                        className={`w-full py-4 rounded-2xl font-bold text-white transition-all shadow-xl flex items-center justify-center gap-3 ${
-                            loading ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800"
+                        className={`w-full py-4 rounded-2xl font-bold text-[#1a1a1a] transition-all shadow-xl flex items-center justify-center gap-3 ${
+                            loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#d4a843] hover:bg-[#c49833] text-[#1a1a1a]"
                         }`}
                     >
                         {loading ? <BiLoaderAlt className="animate-spin text-xl" /> : "Log In"}

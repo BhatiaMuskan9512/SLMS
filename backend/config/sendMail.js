@@ -20,13 +20,22 @@ const sendMail = async (to, otp) => {
         },
     });
 
+    // ADD THIS — verify connection before sending
+    try {
+        await transporter.verify();
+        console.log("✅ Mail server connected successfully");
+    } catch (verifyError) {
+        console.log("❌ Mail server connection failed:", verifyError.message);
+        return null;
+    }
+    
     try {
         // 2. Define email options
         const info = await transporter.sendMail({
             from: process.env.USER_EMAIL, // Sender address
             to: to,                      // Recipient address
             subject: "Verify Your SkillLink Account",
-            // You can send plain text, but the tutorial uses HTML for a better look
+            
             html: `
                 <div style="font-family: Arial, sans-serif; line-height: 1.6;">
                     <h2>SkillLink Verification Code</h2>

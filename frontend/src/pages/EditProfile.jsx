@@ -71,99 +71,81 @@ const EditProfile = () => {
         }
     };
 
-    return (
-        <div className="min-h-screen bg-gray-50 pt-[100px] pb-20 px-5 flex flex-col items-center">
+return (
+    /* 🌟 Is container ko humne 'fixed' rakha hai par 'top-[70px]' diya hai 
+       taaki upar se Navbar dikhta rahe aur niche scroller na aaye */
+    <div className="!fixed !inset-0 !top-[70px] !bg-[#FDFCF9] !flex !flex-col !items-center !justify-center !p-4 !overflow-hidden !z-10">
+        
+        <div className="w-full !max-w-[450px] !px-6 animate-fadeIn">
             
-            {/* --- Header / Back Button --- */}
-            <div className="w-full max-w-[500px] mb-8">
-                <button 
-                    onClick={() => navigate(-1)} 
-                    className="flex items-center gap-2 text-gray-500 hover:text-black transition-all"
-                >
-                    <BiArrowBack /> Back to Profile
-                </button>
-            </div>
+            {/* Back to Profile Link */}
+            <button 
+                onClick={() => navigate('/my-profile')} 
+                className="mb-4 text-gray-400 hover:text-gray-600 flex items-center gap-2 font-bold text-[10px] bg-transparent border-none cursor-pointer uppercase tracking-widest"
+            >
+                <BiArrowBack /> Back to Profile
+            </button>
 
-            {/* --- Edit Form Card --- */}
-            <div className="w-full max-w-[500px] bg-white rounded-3xl shadow-sm border border-gray-100 p-8 sm:p-10">
-                <div className="flex flex-col items-center mb-10 text-center">
+            {/* Main Edit Card */}
+            <div className="bg-white rounded-[35px] shadow-[0_10px_40px_rgba(0,0,0,0.03)] border border-gray-50 p-8">
+                
+                {/* Profile Picture Section */}
+                <div className="flex flex-col items-center mb-8">
                     <div className="relative group">
                         <img 
                             src={preview} 
                             alt="Profile Preview" 
-                            className="w-32 h-32 rounded-full object-cover border-4 border-gray-50 shadow-md group-hover:opacity-80 transition-all"
+                            className="w-24 h-24 rounded-full object-cover border-4 border-gray-50 shadow-sm"
                         />
-                        <label 
-                            htmlFor="profile-upload" 
-                            className="absolute bottom-1 right-1 bg-black text-white p-2 rounded-full cursor-pointer hover:scale-110 transition-all shadow-lg"
-                        >
-                            <BiCloudUpload className="text-xl" />
-                            <input 
-                                type="file" 
-                                id="profile-upload" 
-                                hidden 
-                                accept="image/*"
-                                onChange={handleImageChange}
-                            />
+                        <label className="absolute bottom-1 right-1 bg-black text-white p-2 rounded-full cursor-pointer hover:scale-110 transition-all shadow-lg flex items-center justify-center">
+                            <BiCloudUpload size={18} />
+                            <input type="file" className="hidden" onChange={handleImageChange} accept="image/*" />
                         </label>
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-800 mt-6">Edit Your Profile</h1>
-                    <p className="text-sm text-gray-400 mt-1">Update your display name and profile picture.</p>
+                    <h2 className="text-xl font-black text-gray-800 mt-4">Edit Your Profile</h2>
+                    <p className="text-gray-400 text-[11px] font-bold uppercase tracking-wider mt-1">Update display name & photo</p>
                 </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Name Input */}
-                    <div className="space-y-2">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Full Name</label>
+                {/* Form Section */}
+                <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="relative">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
                         <div className="relative">
-                            <BiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-xl" />
+                            <BiUser className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-lg" />
                             <input 
                                 type="text" 
-                                placeholder="Enter your name"
-                                className="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-black transition-all"
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
+                                className="w-full mt-1 pl-12 pr-4 py-3.5 bg-gray-50 border-none rounded-2xl outline-none focus:ring-2 focus:ring-black/5 font-bold text-gray-700"
                                 required
                             />
                         </div>
                     </div>
 
-                    {/* Email Display (Read-only for security as per video) */}
-                    <div className="space-y-2 opacity-60">
-                        <label className="text-xs font-bold text-gray-500 uppercase tracking-widest ml-1">Email Address</label>
+                    <div className="relative">
+                        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
                         <input 
                             type="email" 
-                            disabled 
-                            className="w-full px-4 py-4 rounded-2xl border border-gray-100 bg-gray-200 cursor-not-allowed"
-                            value={user?.email || ""}
+                            value={user?.email} 
+                            disabled
+                            className="w-full mt-1 p-4 bg-gray-100 border-none rounded-2xl text-gray-400 font-medium cursor-not-allowed"
                         />
-                        <p className="text-[10px] text-gray-400 ml-1 italic">Email cannot be changed for security reasons.</p>
+                        <p className="text-[9px] text-gray-400 mt-1 ml-1 italic">Email is fixed for security.</p>
                     </div>
 
-                    {/* Submit Button */}
                     <button 
                         type="submit"
                         disabled={loading}
-                        className={`w-full py-4 rounded-2xl font-bold text-white transition-all shadow-xl flex items-center justify-center gap-3 ${
-                            loading ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800"
-                        }`}
+                        className="w-full mt-2 py-4 bg-black text-white rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:shadow-2xl transition-all disabled:bg-gray-300 border-none cursor-pointer flex items-center justify-center gap-2"
                     >
-                        {loading ? (
-                            <>
-                                <BiLoaderAlt className="animate-spin text-xl" />
-                                Updating Profile...
-                            </>
-                        ) : (
-                            <>
-                                <BiSave className="text-xl" />
-                                Save Changes
-                            </>
-                        )}
+                        {loading ? <BiLoaderAlt className="animate-spin" /> : <BiSave size={18} />}
+                        {loading ? "Saving..." : "Save Changes"}
                     </button>
                 </form>
             </div>
         </div>
-    );
+    </div>
+);
 };
 
 export default EditProfile;

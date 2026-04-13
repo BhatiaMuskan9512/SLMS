@@ -13,6 +13,7 @@ import {
     getCreatorById,
     enrollInCourse,
     getEnrolledCourses,
+    updateLectureProgress,
     getCourseCount,
     getCourseCategoryStats
 } from "../controllers/courseController.js";
@@ -39,8 +40,10 @@ courseRouter.get("/get-creator", isAuth, getCreatorCourses);
 // Edit course details and upload thumbnail (Protected + Multer)
 courseRouter.post("/edit-course/:courseId", isAuth, upload.single("thumbnail"), editCourse);
 
+courseRouter.post("/update-progress", isAuth, updateLectureProgress);
+
 // Get single course details by ID (Protected)
-courseRouter.get("/get-course/:courseId", isAuth, getCourseById);
+courseRouter.get("/get-course/:courseId", getCourseById);
 
 // Delete a course (Protected)
 courseRouter.delete("/remove/:courseId", isAuth, removeCourse);
@@ -53,6 +56,7 @@ courseRouter.post("/:courseId/enroll", isAuth, enrollInCourse); // <-- 2. YAHAN 
 
 // Get enrolled courses for the student dashboard
 courseRouter.get("/my-courses", isAuth, getEnrolledCourses);
+
 
 
 // --- FOR LECTURES ---

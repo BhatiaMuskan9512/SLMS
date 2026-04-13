@@ -5,16 +5,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { BiGridAlt, BiBookOpen, BiCompass, BiStats, BiUserCircle, BiCog, BiLogOut } from "react-icons/bi";
-// 🌟 Apne authSlice ka path verify kar lena
 import { setIsAuthenticated, setUser } from '../../redux/authSlice'; 
 
-const Sidebar = () => {
+const Sidebar = ({ setView, activeView }) => {
     const navigate = useNavigate();
     const location = useLocation(); 
-    const dispatch = useDispatch(); // 🌟 Redux dispatch for logout
+    const dispatch = useDispatch(); 
     const [activeTab, setActiveTab] = useState(location.pathname); 
 
-    // Update active tab when URL changes
     useEffect(() => {
         setActiveTab(location.pathname);
     }, [location]);
@@ -23,51 +21,60 @@ const Sidebar = () => {
         { type: 'item', id: 'Dashboard', icon: <BiGridAlt />, label: 'Dashboard', path: '/student/dashboard' },
         { type: 'item', id: 'My Courses', icon: <BiBookOpen />, label: 'My Courses', path: '/my-courses' }, 
         { type: 'item', id: 'Explore', icon: <BiCompass />, label: 'Explore Catalog', path: '/all-courses' },
-        // 🌟 FIX: Added path for Progress Reports
         { type: 'item', id: 'Progress', icon: <BiStats />, label: 'Progress Reports', path: '/student/progress' }, 
         
-        { type: 'section', label: 'ACCOUNT' },
+        // { type: 'section', label: 'ACCOUNT' },
+        { type: 'spacer' },
         { type: 'item', id: 'Profile', icon: <BiUserCircle />, label: 'My Profile', path: '/my-profile' },
-        // 🌟 FIX: Added path for Settings
-        { type: 'item', id: 'Settings', icon: <BiCog />, label: 'Settings', path: '/student/settings' }, 
+        // { type: 'item', id: 'Settings', icon: <BiCog />, label: 'Settings', path: '/student/settings' }, 
         { type: 'item', id: 'Logout', icon: <BiLogOut />, label: 'Logout' }, 
     ];
 
     const handleItemClick = async (item) => {
-        if (item.id === 'Logout') {
-            try {
-                // 1. Backend se cookie clear karne ki API (agar aapne backend me logout banaya hai)
-                await axios.get("http://localhost:8000/api/user/logout", { withCredentials: true });
-            } catch (error) {
-                console.error("Logout error", error);
-            } finally {
-                // 2. Redux state clear karein
-                dispatch(setUser(null));
-                dispatch(setIsAuthenticated(false));
-                
-                // 3. Seedha Landing page par bhejein
-                navigate('/');
-            }
-            return;
+    // 1. Logout Logic
+    if (item.id === 'Logout') {
+        try {
+            await axios.get("http://localhost:8000/api/auth/log-out", { withCredentials: true });
+        } catch (error) {
+            console.error("Logout error", error);
+        } finally {
+            dispatch(setUser(null));
+            dispatch(setIsAuthenticated(false));
+            navigate('/');
         }
-        
-        if (item.path) {
-            setActiveTab(item.path); 
-            navigate(item.path); 
-        }
-    };
+        return; // STOP HERE
+    } 
+
+    // 2. Dashboard Internal Views (Yahan return lagana zaroori hai)
+    if (item.id === 'My Courses') {
+        setView("my-courses");
+        return; // 🌟 STOP: Ye naye page par jaane se rokega
+    } 
+
+    if (item.id === 'Dashboard') {
+        setView("dashboard");
+        return; // 🌟 STOP
+    } 
+
+    if (item.id === 'Progress') {
+        setView("progress");
+        return; // 🌟 STOP
+    }
+
+    // 3. Agar upar mein se koi nahi hai, tabhi navigate karein (Explore, Profile, etc.)
+    if (item.path) {
+        navigate(item.path);
+    }
+};
 
     return (
         <aside className="db-sidebar">
-                      <div 
-                  className="font-serif font-extrabold tracking-tight text-[26px] leading-none flex gap-3 pb-8 pt-6 cursor-pointer w-full justify-center"
-                  //onClick={() => navigate('/')} 
-                  //style={{cursor: 'pointer'}}
-              >
-                  <span className="text-white">Skill</span><span className="text-[#d4a843] font-medium ml-1">Link</span>
-              </div>
+            <div className="font-serif font-extrabold tracking-tight text-[26px] leading-none flex gap-3 pb-8 pt-6 cursor-pointer w-full justify-center">
+                {/* <span className="text-white">Skill</span><span className="text-[#d4a843] font-medium ml-1">Link</span> */}
+                <span className="text-[24px] font-medium text-white">Skill<span className="text-[#E8C97A]">Link</span></span>
+            </div>
 
-            <nav className="db-nav">
+            <nav className="db-nav" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 {menuItems.map((item, index) => {
                     if (item.type === 'section') {
                         return (
@@ -77,7 +84,17 @@ const Sidebar = () => {
                         );
                     }
 
-                    const isActive = activeTab === item.path;
+                    if (item.type === 'spacer') {
+                          return <div key={index} style={{ flexGrow: 1 }} />;
+                        }
+
+                    // Active state logic for 'Dashboard' and 'My Courses'
+                    // Sidebar.jsx ke andar .map() ke andar ye badlav karein
+                    // isActive logic ko replace karein:
+                 const isActive = (item.id === 'Dashboard' && activeView === 'dashboard') || 
+                 (item.id === 'My Courses' && activeView === 'my-courses') ||
+                 (item.id === 'Progress' && activeView === 'progress');
+// 🌟 Tip: Agar activeView 'my-courses' hai, toh Dashboard item 'active' class nahi lega.
 
                     return (
                         <div
@@ -92,6 +109,7 @@ const Sidebar = () => {
             </nav>
         </aside>
     );
+
 };
 
 export default Sidebar;

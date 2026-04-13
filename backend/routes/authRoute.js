@@ -6,7 +6,8 @@ import {
     googleAuth, 
     sendOTP, 
     verifyOTP, 
-    resetPassword 
+    resetPassword,
+    forgetPassword
 } from "../controllers/authController.js";
 
 const authRouter = express.Router();
@@ -38,5 +39,9 @@ authRouter.post("/verify-otp", verifyOTP);
 
 // Step 3: Reset the password after OTP verification
 authRouter.post("/reset-password", resetPassword);
+
+authRouter.post('/forget-password', forgetPassword);
+
+
 
 export default authRouter;

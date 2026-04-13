@@ -72,7 +72,7 @@ const Footer = () => {
         {/* Footer Bottom */}
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="text-[13px] text-white/20 font-light">
-            © 2026 EduNova Technologies Pvt. Ltd. All rights reserved.
+            © 2026 SkillLink Technologies Pvt. Ltd. All rights reserved.
           </div>
           <div className="text-[13px] text-white/20 font-light">
             Made with <span className="text-[#d4a843]">♥</span> in India

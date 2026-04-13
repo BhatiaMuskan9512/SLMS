@@ -13,6 +13,7 @@ const ForgetPassword = () => {
 
     // --- Form Submission Logic ---
     const handleSubmit = async (e) => {
+
         e.preventDefault();
         
         if (!email) {
@@ -30,6 +31,7 @@ const ForgetPassword = () => {
             );
 
             if (response.data) {
+                 localStorage.setItem('userEmail', email);
                 toast.success("OTP sent to your email!");
                 // Redirect to verify-otp page and pass the email via state
                 navigate('/verify-otp', { state: { email } });
@@ -57,7 +59,7 @@ const ForgetPassword = () => {
             {/* --- Main Card --- */}
             <div className="w-full max-w-[450px] bg-white rounded-3xl shadow-sm border border-gray-100 p-8 sm:p-10">
                 <div className="flex flex-col items-center mb-8 text-center">
-                    <div className="w-16 h-16 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center text-3xl mb-4">
+                    <div className="w-16 h-16 bg-[#fdf3d8] text-[#1a1a1a] rounded-full flex items-center justify-center text-3xl mb-4">
                         <BiMailSend />
                     </div>
                     <h1 className="text-2xl font-bold text-gray-800">Forgot Password?</h1>
@@ -77,7 +79,7 @@ const ForgetPassword = () => {
                             <input 
                                 type="email" 
                                 placeholder="name@example.com"
-                                className="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-black transition-all"
+                                className="w-full pl-12 pr-4 py-4 rounded-2xl border border-gray-100 bg-gray-50 outline-none focus:bg-white focus:border-[#d4a843] focus:ring-2 focus:ring-[#d4a843]/20 transition-all"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
@@ -89,8 +91,8 @@ const ForgetPassword = () => {
                     <button 
                         type="submit"
                         disabled={loading}
-                        className={`w-full py-4 rounded-2xl font-bold text-white transition-all shadow-xl flex items-center justify-center gap-3 ${
-                            loading ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800"
+                        className={`w-full py-4 rounded-2xl font-bold text-[#1a1a1a] transition-all shadow-xl flex items-center justify-center gap-3 ${
+                            loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#d4a843] hover:bg-[#c49833] text-[#1a1a1a]"
                         }`}
                     >
                         {loading ? (

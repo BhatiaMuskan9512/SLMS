@@ -11,31 +11,55 @@ const CoursePlayer = () => {
     const [activeLecture, setActiveLecture] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchCourseData = async () => {
-            try {
-                // Backend se course fetch karein (with lectures)
-                const res = await axios.get(`http://localhost:8000/api/course/get-course/${courseId}`, {
-                    withCredentials: true 
-                });
-                setCourse(res.data);
-                if (res.data.lectures?.length > 0) {
-                    setActiveLecture(res.data.lectures[0]);
+useEffect(() => {
+    const fetchCourseData = async () => {
+        try {
+            const res = await axios.get(`http://localhost:8000/api/course/course-lecture/${courseId}`, {
+                withCredentials: true 
+            });
+
+            console.log("Backend Response:", res.data);
+
+            if (res.data.success) {
+                // 🌟 Yahan dhyan dein: res.data.course mein saara data hai
+                const fetchedCourse = res.data.course; 
+                setCourse(fetchedCourse);
+                
+                // Lectures ko correctly set karein
+                if (fetchedCourse.lectures && fetchedCourse.lectures.length > 0) {
+                    setActiveLecture(fetchedCourse.lectures[0]);
                 }
-            } catch (error) {
-                console.error("Error fetching course:", error);
-            } finally {
-                setLoading(false);
             }
-        };
-        fetchCourseData();
-    }, [courseId]);
+        } catch (error) {
+            console.error("Fetch Error:", error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    fetchCourseData();
+}, [courseId]);
 
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-[#F6F4EC]">
             <BiLoaderAlt className="text-5xl text-[#d4a843] animate-spin" />
         </div>
     );
+
+   const onVideoEnd = async () => {
+    try {
+        const res = await axios.post("http://localhost:8000/api/course/update-progress", {
+            courseId: courseId,
+            lectureId: activeLecture._id
+        }, { withCredentials: true });
+        
+        console.log("Response:", res.data);
+        alert("Progress Updated: " + res.data.progress + "%"); // 👈 Testing ke liye alert lagayein
+        
+    } catch (err) {
+        console.error("Error updating progress:", err);
+        alert("Update Failed: " + err.response?.data?.message); // 👈 Error message check karein
+    }
+};
 
     return (
         <div className="flex flex-col lg:flex-row min-h-screen bg-[#F6F4EC] pt-[80px]">
@@ -48,7 +72,7 @@ const CoursePlayer = () => {
 
                 <div className="aspect-video bg-black rounded-2xl overflow-hidden shadow-2xl border border-gray-800">
                     {activeLecture?.videoUrl ? (
-                        <video src={activeLecture.videoUrl} controls autoPlay className="w-full h-full" />
+                        <video src={activeLecture.videoUrl} controls autoPlay onEnded={onVideoEnd} className="w-full h-full" />
                     ) : (
                         <div className="h-full flex items-center justify-center text-gray-500">No video available</div>
                     )}
