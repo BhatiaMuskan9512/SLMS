@@ -175,6 +175,7 @@ const CourseManagement = () => {
   const [selectedCategory, setSelectedCategory] = useState("All categories");
 
   const[selectedCourseId, setSelectedCourseId] = useState(null);
+
   useEffect(() => {
     const fetchCourses = async () => {
       try {
@@ -258,7 +259,8 @@ const CourseManagement = () => {
             All Courses List 🎓
           </h2>
         </div>
-        <button className="flex items-center gap-2 bg-[#D4A843] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#B38D35] transition-all shadow-lg shadow-[#D4A843]/20">
+        <button  onClick={() => navigate('/educator/create-course')} 
+        className="flex items-center gap-2 bg-[#D4A843] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#B38D35] transition-all shadow-lg shadow-[#D4A843]/20">
           <Plus size={20} /> Add Course
         </button>
       </div>
@@ -326,12 +328,12 @@ const CourseManagement = () => {
                 {/* Action Buttons */}
                 <div className="flex items-center justify-between pt-2">
                   <div className="flex gap-2">
-                    <button  onClick={() => setSelectedCourseID(course._id)}
+                    <button  onClick={() => setSelectedCourseId(course._id)}
                     className="p-2.5 bg-green-300 text-gray-700 rounded-xl hover:bg-green-500 transition-all shadow-sm" 
                     title="view course">
                       <Eye size={16} /> 
                     </button>
-                    <button onClick={() => navigate(`/educator/edit-course/${course._id}`)}
+                    <button  onClick={() => navigate(`/educator/edit-course/${course._id}`)}
                     className="p-2.5 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all shadow-md
                      shadow-blue-100" title='edit course'>
                       <Edit2 size={16} />

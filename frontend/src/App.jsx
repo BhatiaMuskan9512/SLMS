@@ -170,7 +170,9 @@ const SmartFooter = () => {
     '/my-courses', 
     '/course-player',
     '/my-profile',
-    '/admin/dashboard'
+    '/admin/dashboard',
+    '/login',
+    '/signup'
   ];
 
   const shouldHide = hideFooterRoutes.some(route => location.pathname.includes(route));
@@ -282,10 +284,10 @@ const App = () => {
 
                 {/* --- Educator Management Routes --- */}
                 <Route path="/educator/courses" element={user?.role === 'educator' ? <Courses /> : <Navigate to="/login" />} />
-                <Route path="/educator/create-course" element={user?.role === 'educator' ? <CreateCourse /> : <Navigate to="/" />} />
-                <Route path="/educator/edit-course/:courseId" element={user?.role === 'educator' ? <EditCourse /> : <Navigate to="/" />} />
-                <Route path="/educator/create-lecture/:courseId" element={user?.role === 'educator' ? <CreateLecture /> : <Navigate to="/" />} />
-                <Route path="/educator/edit-lecture/:lectureId" element={user?.role === 'educator' ? <EditLecture /> : <Navigate to="/" />} />
+                <Route path="/educator/create-course" element={user?.role === 'educator' ||  user?.role === 'admin' ?  <CreateCourse /> : <Navigate to="/" />} />
+                <Route path="/educator/edit-course/:courseId" element={user?.role === 'educator' || user?.role === 'admin' ? <EditCourse /> : <Navigate to="/" />} />
+                <Route path="/educator/create-lecture/:courseId" element={user?.role === 'educator' || user?.role === 'admin' ? <CreateLecture /> : <Navigate to="/" />} />
+                <Route path="/educator/edit-lecture/:lectureId" element={user?.role === 'educator' || user?.role === 'admin' ? <EditLecture /> : <Navigate to="/" />} />
                 <Route path="/educator/students" element={user?.role === 'educator' ? <Students /> : <Navigate to="/" />} />
             </Routes>
         </SmartMain>

@@ -11,7 +11,7 @@ const CourseViewModal = ({ courseId, onClose }) => {
     const fetchCourse = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8000/api/course/${courseId}`
+          `http://localhost:8000/api/course/get-course/${courseId}`
         );
         console.log("Course data:", res.data);
         setCourse(res.data);
@@ -159,7 +159,7 @@ const CourseViewModal = ({ courseId, onClose }) => {
 
               {course.lectures?.length === 0 ? (
                 <p className="text-center text-gray-400 italic text-sm py-4">
-                  No lectures added yet.
+                  No lectures added.
                 </p>
               ) : (
                 <div className="space-y-2">
@@ -182,7 +182,7 @@ const CourseViewModal = ({ courseId, onClose }) => {
                         {lecture.lectureTitle}
                       </p>
 
-                      {/* Free/Locked Badge */}
+                      {/* Free/Locked Badge
                       {lecture.isPreviewFree ? (
                         <span className="flex items-center gap-1 
                                          bg-green-100 text-green-600 
@@ -197,7 +197,7 @@ const CourseViewModal = ({ courseId, onClose }) => {
                                          rounded-lg flex-shrink-0">
                           <Lock size={10}/> Paid
                         </span>
-                      )}
+                      )} */}
                     </div>
                   ))}
                 </div>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { Search, Edit2, Trash2, Plus, Mail, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import { Search, Edit2, Trash2, Plus, Mail, ChevronLeft, ChevronRight, Eye , X} from 'lucide-react';
+import InstructorViewModal from './InstructorViewModal';
 
 const InstructorManagement = () => {
   const [instructors, setInstructors] = useState([]);
@@ -13,6 +14,157 @@ const InstructorManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const instructorsPerPage = 6; // Ek page par kitne instructors dikhane hain (Aap 8 bhi rakh sakti hain)
   
+  const [selectedInstructorId, setSelectedInstructorId] = useState(null);
+
+  // Yeh states abhi missing hain
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [addForm, setAddForm] = useState({ name: "", email: "", password: "" });
+  const [addPhoto, setAddPhoto] = useState(null);
+  const [addPhotoPreview, setAddPhotoPreview] = useState(null);
+  const [addLoading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState("");
+  const [otpStep, setOtpStep] = useState(false); // ✅ OTP step show karo
+  const [otpValue, setOtpValue] = useState("");
+  const [otpLoading, setOtpLoading] = useState(false);
+
+
+ const handleAddInstructor = async () => {
+    setAddLoading(true);
+    setAddError("");
+
+    try {
+        // ✅ FormData use karo - JSON object nahi
+        const data = new FormData();
+        data.append("name", addForm.name);
+        data.append("email", addForm.email);
+        data.append("password", addForm.password);
+        if (addPhoto) data.append("photoUrl", addPhoto);
+
+        const res = await axios.post(
+            "http://localhost:8000/api/user/send-instructor-otp",
+            data, // ✅ JSON object ki jagah data bhejo
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                    "Content-Type": "multipart/form-data" // ✅ Yeh bhi add karo
+                }
+            }
+        );
+
+        if (res.data.success) {
+            setOtpStep(true);
+        }
+    } catch (err) {
+        setAddError(err.response?.data?.message || "Failed to send OTP.");
+    } finally {
+        setAddLoading(false);
+    }
+};
+
+const handleVerifyOTP = async () => {
+    setOtpLoading(true);
+    setAddError("");
+
+    try {
+        const res = await axios.post(
+            "http://localhost:8000/api/user/verify-instructor-otp",
+            { email: addForm.email, otp: otpValue },
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`
+                }
+            }
+        );
+
+        if (res.data.success) {
+            // ✅ List mein add karo
+            setInstructors(prev => [...prev, res.data.instructor]);
+            
+            // ✅ Reset sab kuch
+            setShowAddModal(false);
+            setOtpStep(false);
+            setOtpValue("");
+            setAddForm({ name: "", email: "", password: "" });
+            setAddPhoto(null);
+            setAddPhotoPreview(null);
+        }
+    } catch (err) {
+        setAddError(err.response?.data?.message || "Invalid OTP!");
+    } finally {
+        setOtpLoading(false);
+    }
+};
+
+
+  // Instructor Edit button pe click
+  // 1. State add karo upar
+const [selectedInstructor, setSelectedInstructor] = useState(null);
+const [editForm, setEditForm] = useState({
+  name: "", email: "", role: "educator"
+});
+const [photoFile, setPhotoFile] = useState(null);
+const [photoPreview, setPhotoPreview] = useState(null);
+const [editLoading, setEditLoading] = useState(false);
+
+// 2. Edit button click par yeh function call karo
+const handleEditClick = (inst) => {
+  setSelectedInstructor(inst);
+  setEditForm({ name: inst.name, email: inst.email, role: inst.role });
+  setPhotoPreview(inst.photoUrl || null);
+  setPhotoFile(null);
+};
+
+// 3. Photo change handler
+const handlePhotoChange = (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    setPhotoFile(file);
+    setPhotoPreview(URL.createObjectURL(file));
+  }
+};
+
+// 4. Submit handler
+const handleEditSubmit = async () => {
+  setEditLoading(true);
+  try {
+    const data = new FormData();
+    data.append("name", editForm.name);
+    data.append("email", editForm.email);
+    data.append("role", editForm.role);
+    if (photoFile) data.append("photoUrl", photoFile);
+
+    const res = await axios.put(
+      `http://localhost:8000/api/user/update-instructor/${selectedInstructor._id}`,
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+
+    if (res.data.success) {
+      // ✅ List mein bhi update karo
+      setInstructors(prev =>
+        prev.map(inst =>
+          inst._id === selectedInstructor._id
+            ? { ...inst, ...res.data.instructor }
+            : inst
+        )
+      );
+      setSelectedInstructor(null); // Modal band karo
+    }
+  } catch (err) {
+    console.error("Update failed:", err);
+  } finally {
+    setEditLoading(false);
+  }
+};
+
+
+
+
   useEffect(() => {
     const fetchInstructors = async () => {
       try {
@@ -36,11 +188,17 @@ const InstructorManagement = () => {
     fetchInstructors();
   }, []);
 
-  // Filter Logic
-  const filteredInstructors = instructors.filter(inst => 
-    inst.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inst.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredInstructors = instructors.filter(inst => {
+    const matchesSearch =
+        inst.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        inst.email.toLowerCase().includes(searchTerm.toLowerCase());
+
+    const matchesCourse =
+        courseFilter === "All Courses" ||
+        inst.courses?.some(c => c.title === courseFilter); // ✅ Course filter
+
+    return matchesSearch && matchesCourse;
+});
 
 
   // 🌟 Pagination Calculation
@@ -57,6 +215,31 @@ const totalPages = Math.ceil(filteredInstructors.length / instructorsPerPage);
 useEffect(() => {
   setCurrentPage(1);
 }, [searchTerm, courseFilter]);
+
+
+const handleDeleteInstructor = async (id) => {
+    const confirm = window.confirm("Are you sure you want to delete this instructor?");
+    if (!confirm) return;
+
+    try {
+        const res = await axios.delete(
+            `http://localhost:8000/api/user/delete-instructor/${id}`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}` // ✅ Token bhejo
+                }
+            }
+        );
+        if (res.data.success) {
+            setInstructors(prev => prev.filter(inst => inst._id !== id));
+            alert("Instructor deleted successfully!");
+        }
+    } catch (error) {
+        console.error("Delete error:", error);
+        alert("Failed to delete instructor.");
+    }
+};
+
 
   return (
     <div className="p-0 min-h-screen">
@@ -82,7 +265,8 @@ useEffect(() => {
             Intructors List 🎓
           </h2>
         </div>
-        <button className="flex items-center gap-2 bg-[#D4A843] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#B38D35] transition-all shadow-lg shadow-[#D4A843]/20">
+        <button onClick={() => setShowAddModal(true)} 
+        className="flex items-center gap-2 bg-[#D4A843] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#B38D35] transition-all shadow-lg shadow-[#D4A843]/20">
           <Plus size={20} /> Add Instructor
         </button>
       </div>
@@ -152,17 +336,18 @@ useEffect(() => {
                 </div>
                 
                 <div className="flex gap-2">
-                   <button 
+                   <button onClick={() => setSelectedInstructorId(inst._id)}
                     className="p-2.5 bg-green-300 text-gray-700 rounded-xl hover:bg-green-500 transition-all shadow-sm" 
                     title="view instructor">
                       <Eye size={16} /> 
                     </button>
-                  <button 
+                  <button onClick={() => handleEditClick(inst)}  // ✅
                   className="p-2.5 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all shadow-md
                    shadow-blue-100" title='edit instructor'>
                   <Edit2 size={16} />
                  </button>
-                  <button  className="p-2.5 bg-[#FF6B6B] text-white rounded-xl hover:bg-red-600 transition-all shadow-md shadow-red-100"
+                  <button  onClick={() => handleDeleteInstructor(inst._id)}
+                  className="p-2.5 bg-[#FF6B6B] text-white rounded-xl hover:bg-red-600 transition-all shadow-md shadow-red-100"
                   title="Delete instructor">
                     <Trash2 size={16} />
                   </button>
@@ -210,6 +395,297 @@ useEffect(() => {
           </button>
         </div>
       </div>
+
+      {selectedInstructorId && (
+        <InstructorViewModal 
+          instructorId={selectedInstructorId}
+           onClose={() => setSelectedInstructorId(null)}
+          />
+      )}
+      {/* Edit Modal */}
+        {selectedInstructor && (
+          <div className="fixed inset-0 bg-black/40 backdrop-blur-sm 
+                          flex items-center justify-center z-[1000] p-4">
+            
+            <div className="bg-white w-full max-w-md rounded-[32px] shadow-2xl overflow-hidden">
+              
+              {/* Header */}
+              <div className="bg-gradient-to-br from-[#D4A843] to-[#B38D35] p-6 relative">
+                <button
+                  onClick={() => setSelectedInstructor(null)}
+                  className="absolute top-4 right-4 bg-white/20 hover:bg-white/40 
+                            text-white p-2 rounded-full transition-all"
+                >
+                  <X size={18} />
+                </button>
+                <h2 className="text-white text-xl font-black">Edit Instructor</h2>
+                <p className="text-white/70 text-sm mt-1">Update instructor details</p>
+              </div>
+
+              {/* Form */}
+              <div className="p-6 space-y-5">
+
+                {/* Photo */}
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-24 h-24 rounded-[20px] overflow-hidden bg-gray-100">
+                    {photoPreview ? (
+                      <img src={photoPreview} alt="Preview" className="w-full h-full object-cover"/>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-2xl font-black text-gray-400">
+                        {editForm.name?.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  <label className="flex items-center gap-2 cursor-pointer bg-[#F9F6EE] 
+                                    border border-[#E8E1CD] px-4 py-2 rounded-xl 
+                                    text-sm font-bold text-gray-600 hover:bg-[#F0E8D0] transition-all">
+                    📷 Change Photo
+                    <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange}/>
+                  </label>
+                </div>
+
+                {/* Name */}
+                <div>
+                  <label className="text-xs font-black text-gray-500 uppercase tracking-wider mb-1 block">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    value={editForm.name}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full px-4 py-3 bg-[#F9F6EE] border border-[#E8E1CD] 
+                              rounded-xl text-sm outline-none focus:border-[#D4A843] transition-all"
+                  />
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="text-xs font-black text-gray-500 uppercase tracking-wider mb-1 block">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={editForm.email}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, email: e.target.value }))}
+                    className="w-full px-4 py-3 bg-[#F9F6EE] border border-[#E8E1CD] 
+                              rounded-xl text-sm outline-none focus:border-[#D4A843] transition-all"
+                  />
+                </div>
+
+                {/* Role */}
+                <div>
+                  <label className="text-xs font-black text-gray-500 uppercase tracking-wider mb-1 block">
+                    Role
+                  </label>
+                  <select
+                    value={editForm.role}
+                    onChange={(e) => setEditForm(prev => ({ ...prev, role: e.target.value }))}
+                    className="w-full px-4 py-3 bg-[#F9F6EE] border border-[#E8E1CD] 
+                              rounded-xl text-sm outline-none focus:border-[#D4A843] transition-all"
+                  >
+                    <option value="educator">Educator</option>
+                    <option value="student">Student</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+
+                {/* Buttons */}
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={() => setSelectedInstructor(null)}
+                    className="flex-1 py-3 border border-[#E8E1CD] rounded-xl 
+                              text-sm font-bold text-gray-500 hover:bg-[#F9F6EE] transition-all"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleEditSubmit}
+                    disabled={editLoading}
+                    className="flex-1 py-3 bg-[#D4A843] text-white rounded-xl 
+                              text-sm font-bold hover:bg-[#B38D35] transition-all
+                              disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {editLoading ? "Saving..." : "Save Changes"}
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Add Instructor Modal */}
+{showAddModal && (
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm 
+                    flex items-center justify-center z-[1000] p-4">
+        
+        <div className="bg-white w-full max-w-md rounded-[32px] shadow-2xl overflow-hidden">
+            
+            {/* Header */}
+            <div className="bg-gradient-to-br from-[#D4A843] to-[#B38D35] p-6 relative">
+                <button
+                    onClick={() => { setShowAddModal(false); setOtpStep(false); setOtpValue(""); }}
+                    className="absolute top-4 right-4 bg-white/20 hover:bg-white/40 
+                               text-white p-2 rounded-full transition-all"
+                >
+                    <X size={18} />
+                </button>
+                <h2 className="text-white text-xl font-black">
+                    {otpStep ? "Verify OTP 🔐" : "Add New Instructor"}
+                </h2>
+                <p className="text-white/70 text-sm mt-1">
+                    {otpStep ? `OTP sent to ${addForm.email}` : "Fill in the details below"}
+                </p>
+            </div>
+
+            <div className="p-6 space-y-5">
+
+                {/* OTP Step */}
+                {otpStep ? (
+                    <>
+                        <p className="text-center text-gray-500 text-sm">
+                            6-digit OTP instructor ki email pe bheja gaya hai
+                        </p>
+
+                        <input
+                            type="text"
+                            maxLength="6"
+                            placeholder="0 0 0 0 0 0"
+                            value={otpValue}
+                            onChange={(e) => setOtpValue(e.target.value)}
+                            className="w-full text-center text-2xl tracking-[15px] font-bold 
+                                       py-4 bg-[#F9F6EE] border border-[#E8E1CD] rounded-xl 
+                                       outline-none focus:border-[#D4A843] transition-all"
+                        />
+
+                        {addError && (
+                            <p className="text-red-500 text-sm font-bold text-center">{addError}</p>
+                        )}
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => { setOtpStep(false); setOtpValue(""); }}
+                                className="flex-1 py-3 border border-[#E8E1CD] rounded-xl 
+                                           text-sm font-bold text-gray-500 hover:bg-[#F9F6EE]"
+                            >
+                                Back
+                            </button>
+                            <button
+                                onClick={handleVerifyOTP}
+                                disabled={otpLoading || otpValue.length !== 6}
+                                className="flex-1 py-3 bg-[#D4A843] text-white rounded-xl 
+                                           text-sm font-bold hover:bg-[#B38D35] transition-all
+                                           disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {otpLoading ? "Verifying..." : "Verify & Add"}
+                            </button>
+                        </div>
+                    </>
+
+                ) : (
+                    // Form Step
+                    <>
+                        {/* Photo Upload */}
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="w-24 h-24 rounded-[20px] overflow-hidden bg-gray-100">
+                                {addPhotoPreview ? (
+                                    <img src={addPhotoPreview} alt="Preview" className="w-full h-full object-cover"/>
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-3xl text-gray-300">
+                                        👤
+                                    </div>
+                                )}
+                            </div>
+                            <label className="flex items-center gap-2 cursor-pointer bg-[#F9F6EE] 
+                                              border border-[#E8E1CD] px-4 py-2 rounded-xl 
+                                              text-sm font-bold text-gray-600 hover:bg-[#F0E8D0] transition-all">
+                                📷 Upload Photo
+                                <input 
+                                    type="file" accept="image/*" className="hidden"
+                                    onChange={(e) => {
+                                        const file = e.target.files[0];
+                                        if (file) {
+                                            setAddPhoto(file);
+                                            setAddPhotoPreview(URL.createObjectURL(file));
+                                        }
+                                    }}
+                                />
+                            </label>
+                        </div>
+
+                        {/* Name */}
+                        <div>
+                            <label className="text-xs font-black text-gray-500 uppercase tracking-wider mb-1 block">
+                                Full Name
+                            </label>
+                            <input
+                                type="text"
+                                value={addForm.name}
+                                onChange={(e) => setAddForm(prev => ({ ...prev, name: e.target.value }))}
+                                className="w-full px-4 py-3 bg-[#F9F6EE] border border-[#E8E1CD] 
+                                           rounded-xl text-sm outline-none focus:border-[#D4A843] transition-all"
+                                placeholder="Enter instructor name"
+                            />
+                        </div>
+
+                        {/* Email */}
+                        <div>
+                            <label className="text-xs font-black text-gray-500 uppercase tracking-wider mb-1 block">
+                                Email
+                            </label>
+                            <input
+                                type="email"
+                                value={addForm.email}
+                                onChange={(e) => setAddForm(prev => ({ ...prev, email: e.target.value }))}
+                                className="w-full px-4 py-3 bg-[#F9F6EE] border border-[#E8E1CD] 
+                                           rounded-xl text-sm outline-none focus:border-[#D4A843] transition-all"
+                                placeholder="Enter email address"
+                            />
+                        </div>
+
+                        {/* Password */}
+                        <div>
+                            <label className="text-xs font-black text-gray-500 uppercase tracking-wider mb-1 block">
+                                Password
+                            </label>
+                            <input
+                                type="password"
+                                value={addForm.password}
+                                onChange={(e) => setAddForm(prev => ({ ...prev, password: e.target.value }))}
+                                className="w-full px-4 py-3 bg-[#F9F6EE] border border-[#E8E1CD] 
+                                           rounded-xl text-sm outline-none focus:border-[#D4A843] transition-all"
+                                placeholder="Set a password"
+                            />
+                        </div>
+
+                        {addError && (
+                            <p className="text-red-500 text-sm font-bold text-center">{addError}</p>
+                        )}
+
+                        <div className="flex gap-3 pt-2">
+                            <button
+                                onClick={() => setShowAddModal(false)}
+                                className="flex-1 py-3 border border-[#E8E1CD] rounded-xl 
+                                           text-sm font-bold text-gray-500 hover:bg-[#F9F6EE]"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={handleAddInstructor}
+                                disabled={addLoading || !addForm.name || !addForm.email || !addForm.password}
+                                className="flex-1 py-3 bg-[#D4A843] text-white rounded-xl 
+                                           text-sm font-bold hover:bg-[#B38D35] transition-all
+                                           disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {addLoading ? "Sending OTP..." : "Send OTP"}
+                            </button>
+                        </div>
+                    </>
+                )}
+            </div>
+        </div>
+    </div>
+)}
     </div>
   );
 };
