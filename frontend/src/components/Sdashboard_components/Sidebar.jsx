@@ -23,7 +23,8 @@ const Sidebar = ({ setView, activeView }) => {
         { type: 'item', id: 'Explore', icon: <BiCompass />, label: 'Explore Catalog', path: '/all-courses' },
         { type: 'item', id: 'Progress', icon: <BiStats />, label: 'Progress Reports', path: '/student/progress' }, 
         
-        { type: 'section', label: 'ACCOUNT' },
+        // { type: 'section', label: 'ACCOUNT' },
+        { type: 'spacer' },
         { type: 'item', id: 'Profile', icon: <BiUserCircle />, label: 'My Profile', path: '/my-profile' },
         // { type: 'item', id: 'Settings', icon: <BiCog />, label: 'Settings', path: '/student/settings' }, 
         { type: 'item', id: 'Logout', icon: <BiLogOut />, label: 'Logout' }, 
@@ -33,7 +34,7 @@ const Sidebar = ({ setView, activeView }) => {
     // 1. Logout Logic
     if (item.id === 'Logout') {
         try {
-            await axios.get("http://localhost:8000/api/user/logout", { withCredentials: true });
+            await axios.get("http://localhost:8000/api/auth/log-out", { withCredentials: true });
         } catch (error) {
             console.error("Logout error", error);
         } finally {
@@ -69,10 +70,11 @@ const Sidebar = ({ setView, activeView }) => {
     return (
         <aside className="db-sidebar">
             <div className="font-serif font-extrabold tracking-tight text-[26px] leading-none flex gap-3 pb-8 pt-6 cursor-pointer w-full justify-center">
-                <span className="text-white">Skill</span><span className="text-[#d4a843] font-medium ml-1">Link</span>
+                {/* <span className="text-white">Skill</span><span className="text-[#d4a843] font-medium ml-1">Link</span> */}
+                <span className="text-[24px] font-medium text-white">Skill<span className="text-[#E8C97A]">Link</span></span>
             </div>
 
-            <nav className="db-nav">
+            <nav className="db-nav" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
                 {menuItems.map((item, index) => {
                     if (item.type === 'section') {
                         return (
@@ -81,6 +83,10 @@ const Sidebar = ({ setView, activeView }) => {
                             </div>
                         );
                     }
+
+                    if (item.type === 'spacer') {
+                          return <div key={index} style={{ flexGrow: 1 }} />;
+                        }
 
                     // Active state logic for 'Dashboard' and 'My Courses'
                     // Sidebar.jsx ke andar .map() ke andar ye badlav karein
@@ -103,6 +109,7 @@ const Sidebar = ({ setView, activeView }) => {
             </nav>
         </aside>
     );
+
 };
 
 export default Sidebar;

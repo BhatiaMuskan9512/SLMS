@@ -5,7 +5,9 @@ import {
     getCurrentUser, 
     getInstructorCount, 
     register, 
-    updateProfile 
+    updateProfile,
+    changePassword, 
+    getStudentById
 } from "../controllers/userController.js";
 import isAuth from "../middleware/isAuth.js";
 import upload from "../middleware/multer.js";
@@ -18,6 +20,8 @@ userRouter.get("/all",getAllUsers);
 userRouter.get("/instructors-count", getInstructorCount);
 
 userRouter.post("/register",register);
+
+userRouter.get("/student/:id",getStudentById);
 
 userRouter.delete("/delete-student/:id",deleteStudent);
 /**
@@ -32,5 +36,7 @@ userRouter.get("/get-current-user", isAuth, getCurrentUser);
  * Multer: upload.single("photoUrl") handles the profile picture file
  */
 userRouter.post("/profile", isAuth, upload.single("photoUrl"), updateProfile);
+
+userRouter.put("/change-password", isAuth, changePassword);
 
 export default userRouter;

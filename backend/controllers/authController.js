@@ -321,13 +321,36 @@ export const resetPassword = async (req, res) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         user.password = hashedPassword;
-        user.isOtpVerified = false; // Reset verification status
+        //user.isOtpVerified = true; // Reset verification status
 
         await user.save();
 
-        return res.status(200).json({ message: "Reset password successfully" });
+        return res.status(200).json({ success:true, message: "Reset password successfully" });
 
     } catch (error) {
         return res.status(500).json({ message: `Reset Password Error: ${error.message}` });
+    }
+};
+
+
+// authController.js mein ye function add karo:
+export const forgetPassword = async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await User.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        user.resetOtp = otp;
+        user.otpExpires = Date.now() + 5 * 60 * 1000;
+        await user.save();
+
+        await sendMail(email, otp);
+
+        return res.status(200).json({ success: true, message: "OTP sent to your email!" });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: `Error: ${error.message}` });
     }
 };

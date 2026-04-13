@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { BiPlayCircle, BiLoaderAlt } from "react-icons/bi";
 import { useNavigate } from 'react-router-dom';
-
 const MyEnrolledCourses = () => {
     const navigate = useNavigate();
     const [enrolledCourses, setEnrolledCourses] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         const fetchMyCourses = async () => {
@@ -24,51 +24,87 @@ const MyEnrolledCourses = () => {
         fetchMyCourses();
     }, []);
 
+    const filteredCourses = enrolledCourses.filter(course =>
+    course.title.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     if (loading) return <div className="flex justify-center p-10"><BiLoaderAlt className="text-3xl animate-spin text-[#d4a843]" /></div>;
 
-    return (
-        <div className="w-full animate-fadeIn">
-            {/* Header Section */}
-            <div className="flex items-center justify-between mb-8">
-                <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-                    My Learning <BiPlayCircle className="text-[#d4a843]" />
-                </h2>
-                <span className="text-sm text-gray-500 bg-white px-4 py-1 rounded-full border border-gray-100 shadow-sm">
+return (
+     <div className="w-full min-h-screen bg-[#F6F4EC]">
+    <div className="w-full min-h-screen animate-fadeIn pt-[100px] px-10 pb-10 max-w-[1200px] mx-auto bg-[#F6F4EC]">
+        
+        {/* ✅ Back Button */}
+            <button 
+                onClick={() => navigate(-1)} 
+                className="mb-4 text-gray-400 hover:text-gray-600 flex items-center gap-2 font-bold text-xs bg-transparent border-none cursor-pointer uppercase tracking-widest"
+            >
+                ← Back
+            </button>
+
+        {/* Header */}
+        <div className="flex items-center justify-between mb-4">
+            <h2 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                My Learning <BiPlayCircle className="text-[#d4a843]" />
+            </h2>
+            <div className="flex items-center gap-3">
+                {/* Search Bar - compact */}
+                <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm shadow-sm focus-within:border-[#d4a843]">
+                    <span>🔍</span>
+                    <input
+                        type="text"
+                        placeholder="Search courses..."
+                        className="outline-none bg-transparent w-[200px] text-gray-800"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+                <span className="text-sm font-semibold text-[#d4a843] bg-white px-4 py-2 rounded-xl border border-gray-100 shadow-sm whitespace-nowrap">
                     {enrolledCourses.length} Courses Enrolled
                 </span>
             </div>
-
-            {/* Courses Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {enrolledCourses.map((course) => (
-                    <div 
-                        key={course._id} 
-                        className="bg-white rounded-[28px] overflow-hidden border border-black/5 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col group cursor-pointer"
-                        onClick={() => navigate(`/course-player/${course._id}`)}
-                    >
-                        <div className="relative h-44 w-full bg-gray-100 overflow-hidden">
-                            <img 
-                                src={course.thumbnail || "https://placehold.co/600x400/eeeeee/cccccc?text=SkillLink"} 
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                alt={course.title}
-                            />
-                        </div>
-
-                        <div className="p-6 flex flex-col flex-1">
-                            <h3 className="font-bold text-lg text-gray-800 line-clamp-2 mb-2 group-hover:text-[#d4a843] transition-colors">
-                                {course.title}
-                            </h3>
-                            <p className="text-sm text-gray-400 mb-6 italic">by Expert Instructor</p>
-                            
-                            <button className="w-full mt-auto bg-gray-50 text-gray-700 py-3 rounded-xl text-sm font-bold group-hover:bg-[#d4a843] group-hover:text-white transition-all flex items-center justify-center gap-2">
-                                <BiPlayCircle className="text-lg" /> Continue Learning
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
         </div>
-    );
+
+        {/* Courses Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+            {filteredCourses.map((course) => (
+                <div
+                    key={course._id}
+                    className="bg-white rounded-[24px] overflow-hidden border border-black/5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group cursor-pointer"
+                    onClick={() => navigate(`/course-player/${course._id}`)}
+                >
+                    <div className="h-44 w-full bg-gray-100 overflow-hidden">
+                        <img
+                            src={course.thumbnail || "https://placehold.co/600x400"}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            alt={course.title}
+                        />
+                    </div>
+
+                    <div className="p-5 flex flex-col flex-1">
+                        <h3 className="font-bold text-base text-gray-800 line-clamp-2 mb-1 group-hover:text-[#d4a843] transition-colors">
+                            {course.title}
+                        </h3>
+                        <p className="text-sm text-gray-400 mb-5 italic">
+                            by {course.creator?.name || "Expert Instructor"}
+                        </p>
+
+                        <button className="w-full mt-auto bg-gray-50 text-gray-700 py-2.5 rounded-xl text-sm font-bold group-hover:bg-[#d4a843] group-hover:text-white transition-all flex items-center justify-center gap-2">
+                            <BiPlayCircle className="text-lg" /> Continue Learning
+                        </button>
+                    </div>
+                </div>
+            ))}
+
+            {filteredCourses.length === 0 && (
+                <div className="col-span-full text-center py-16 text-gray-400">
+                    No courses match your search. 🔍
+                </div>
+            )}
+        </div>
+    </div>
+    </div>
+);
 };
 
 export default MyEnrolledCourses;

@@ -56,6 +56,9 @@ if (userRes.data.success) {
         }
     };
     fetchDashboardData();
+
+    window.addEventListener('focus', fetchDashboardData);
+    return () => window.removeEventListener('focus', fetchDashboardData);
 }, [isAuthenticated, navigate]);
 
     if (!isAuthenticated) return null; // Prevents flickering
@@ -183,10 +186,9 @@ return (
         <h4 className="font-bold mb-6 text-gray-500 uppercase text-xs tracking-widest">Course Performance</h4>
         
         <div className="space-y-8">
-            {enrolledCourses.length > 0 ? (
-                enrolledCourses.map((course) => {
-                    // 🌟 Real progress calculate karein (default 0 agar data na ho)
-                    const progressValue = course.progress || 0; 
+            {filteredCourses.length > 0 ? (
+                    filteredCourses.map((course) => {
+                            const progressValue = course.progress || 0;
                     
                     return (
                         <div key={course._id} className="group">
@@ -210,7 +212,9 @@ return (
                     );
                 })
             ) : (
-                <p className="text-center text-gray-400 py-10">No enrolled courses found to track progress.</p>
+                <p className="text-center text-gray-400 py-10">
+                 {searchTerm ? `No courses match "${searchTerm}" 🔍` : "No enrolled courses found to track progress."}
+                </p>
             )}
         </div>
     </div>

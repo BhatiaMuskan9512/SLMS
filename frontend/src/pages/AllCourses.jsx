@@ -97,6 +97,15 @@ const AllCourses = () => {
             <div className="max-w-[1400px] mx-auto mb-12">
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
+                        
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="flex items-center gap-2 text-gray-500 hover:text-[#d4a843] transition-colors mb-4 group"
+                        >
+                            <span className="text-xl group-hover:-translate-x-1 transition-transform">←</span>
+                            <span className="font-medium text-sm">Back</span>
+                        </button>
+
                         <h1 className="text-3xl md:text-4xl font-extrabold text-[#0a0b0f] tracking-tight">
                             {aiActive ? `AI Results for: "${query}"` : "Browse All Courses"}
                         </h1>
@@ -134,7 +143,7 @@ const AllCourses = () => {
                                 <div 
                                     key={course._id} 
                                     className="bg-white rounded-[24px] overflow-hidden border border-black/5 shadow-sm hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col group cursor-pointer"
-                                    onClick={() => navigate(`/course-view/${course._id}`)}
+                                    onClick={() => navigate(`/course-detail/${course._id}`)}
                                 >
                                     <div className="relative h-48 w-full bg-gray-100 overflow-hidden">
                                         {course.thumbnail ? (

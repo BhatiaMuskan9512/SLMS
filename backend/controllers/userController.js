@@ -1,5 +1,6 @@
 import User from "../models/userModel.js";
 import uploadOnCloudinary from "../config/cloudinary.js";
+import bcrypt from "bcrypt"; // Ensure bcrypt import hai upar
 
 // --- 1. GET CURRENT LOGGED-IN USER ---
 export const getCurrentUser = async (req, res) => {
@@ -155,7 +156,45 @@ export const register = async (req, res) => {
     }
 };
 
+// --- 3. CHANGE PASSWORD (Logged-in User) ---
 
+
+export const changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const userId = req.userId; // isAuth middleware se aa raha hai
+
+        // 1. User ko database mein dhoondein
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        // 2. Check karein ki purana password sahi hai ya nahi
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: "Current password is incorrect! 🔐" });
+        }
+
+        // 3. Naye password ko hash karein aur save karein
+        const salt = await bcrypt.genSalt(10);
+        const hashedSecondary = await bcrypt.hash(newPassword, salt);
+        
+        user.password = hashedSecondary;
+        await user.save();
+
+        return res.status(200).json({ 
+            success: true, 
+            message: "Password updated successfully! 🎉" 
+        });
+
+    } catch (error) {
+        return res.status(500).json({ 
+            success: false, 
+            message: `Change Password Error: ${error.message}` 
+        });
+    }
+};
 
 export const deleteStudent = async (req, res) => {
     try {
@@ -169,5 +208,38 @@ export const deleteStudent = async (req, res) => {
         res.status(200).json({ success: true, message: "Student deleted successfully!" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
+// --- GET SINGLE STUDENT BY ID (Admin Preview) ---
+export const getStudentById = async (req, res) => {
+    try {
+        const student = await User.findById(req.params.id)
+            .select("-password")
+            .populate({
+                path: "enrolledCourses",
+                select: "title thumbnail category lectures enrolledStudents"
+            });
+
+        if (!student) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Student not found" 
+            });
+        }
+
+        console.log("Courses count ", student.enrolledCourses.length);
+
+        return res.status(200).json({ 
+            success: true, 
+            student 
+        });
+
+    } catch (error) {
+        return res.status(500).json({ 
+            success: false, 
+            message: error.message 
+        });
     }
 };

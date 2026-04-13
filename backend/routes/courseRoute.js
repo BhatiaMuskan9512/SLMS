@@ -43,7 +43,7 @@ courseRouter.post("/edit-course/:courseId", isAuth, upload.single("thumbnail"), 
 courseRouter.post("/update-progress", isAuth, updateLectureProgress);
 
 // Get single course details by ID (Protected)
-courseRouter.get("/get-course/:courseId", isAuth, getCourseById);
+courseRouter.get("/get-course/:courseId", getCourseById);
 
 // Delete a course (Protected)
 courseRouter.delete("/remove/:courseId", isAuth, removeCourse);

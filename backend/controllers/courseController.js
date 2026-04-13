@@ -154,35 +154,47 @@ export const createLecture = async (req, res) => {
 
 // 8. 🌟 UPDATED: Get all lectures with Enrollment Check
 export const getCourseLectures = async (req, res) => {
-    try {
-        const { courseId } = req.params;
-        const userId = req.userId;
+        try {
+            const { courseId } = req.params;
+            const userId = req.userId;
 
-        const user = await User.findById(userId);
-        const isEnrolled = user.enrolledCourses.some(
-            (item) => item.courseId.toString() === courseId
-        );
+            // Get the course first
+            const course = await Course.findById(courseId).populate('lectures');
+            
+            if (!course) {
+                return res.status(404).json({ success: false, message: "Course not found" });
+            }
 
-        if (!isEnrolled) {
-            return res.status(403).json({ success: false, message: "Not Enrolled" });
+            // Check if user is the CREATOR (educator)
+            const isCreator = course.creator.toString() === userId.toString();
+            
+            // If creator, give access directly — no enrollment check needed
+            if (isCreator) {
+                return res.status(200).json({ success: true, course });
+            }
+
+            // If student, check enrollment
+            const user = await User.findById(userId);
+            
+            if (!user) {
+                return res.status(404).json({ success: false, message: "User not found" });
+            }
+
+            const isEnrolled = user.enrolledCourses.some(
+                (item) => item.courseId && item.courseId.toString() === courseId
+            );
+
+            if (!isEnrolled) {
+                return res.status(403).json({ success: false, message: "Not Enrolled" });
+            }
+
+            return res.status(200).json({ success: true, course });
+
+        } catch (error) {
+            console.log("❌ getCourseLectures error:", error.message);
+            return res.status(500).json({ success: false, message: error.message });
         }
-
-        // 🌟 Yahan change hai: lectures ko explicitly populate karein
-        const course = await Course.findById(courseId).populate({
-            path: 'lectures',
-            model: 'Lecture' // Ensure karein ki model name sahi hai
-        });
-        
-        console.log("Course with lectures:", course); // Terminal mein check karein lectures dikh rahe hain ya nahi
-
-        return res.status(200).json({ 
-            success: true, 
-            course: course 
-        });
-    } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
-    }
-};
+    };
 
 export const editLecture = async (req, res) => {
     const { lectureId } = req.params;
@@ -391,12 +403,6 @@ if (user.lastLectureDate) {
 
 user.lastLectureDate = today; 
 await user.save();
-
-// 🚩 YE LINE SABSE IMPORTANT HAI:
-// Ise IF-ELSE ke bahar rakhein taaki aaj ki date hamesha save ho jaye.
-user.lastLectureDate = today;
-        // 4. FINAL SAVE (Sirf ek baar)
-        await user.save();
         
         res.status(200).json({ 
             success: true,
@@ -456,3 +462,4 @@ export const getCourseCategoryStats = async (req, res) => {
         return res.status(500).json({ success: false, message: error.message });
     }
 };
+

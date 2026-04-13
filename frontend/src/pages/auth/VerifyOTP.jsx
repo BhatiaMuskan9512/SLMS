@@ -47,9 +47,12 @@ const VerifyOTP = () => {
 
         // Agar database true ho gaya hai, toh ye block chalna hi chahiye
         if (response.status === 200 || response.data.success) {
+            const email = localStorage.getItem('userEmail');
+            console.log("Email before saving:", email); // ✅ Debug ke liye
+            localStorage.setItem('resetEmail', email); // ✅ Ye line hai?
             localStorage.removeItem('userEmail');
             toast.success("Verified! Redirecting...");
-            navigate('/login');
+            navigate('/reset-password', { state: { email } });
         }
     } catch (error) {
         // Agar yahan 400 aa raha hai, toh error message print karo

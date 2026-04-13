@@ -137,7 +137,7 @@ import CourseDetail from './pages/CourseDetail';
 // --- Student Pages (Private) ---
 import MyEnrolledCourses from './pages/MyEnrolledCourses';
 import ViewLectures from './pages/ViewLectures';
-import Profile from './pages/Profile';
+import Profile from './pages/Profilepage';
 import EditProfile from './pages/EditProfile';
 
 // --- Educator Management Pages (Private) ---
@@ -169,7 +169,8 @@ const SmartFooter = () => {
     '/student/dashboard', 
     '/my-courses', 
     '/course-player',
-    '/my-profile'
+    '/my-profile',
+    '/admin/dashboard'
   ];
 
   const shouldHide = hideFooterRoutes.some(route => location.pathname.includes(route));
@@ -236,7 +237,7 @@ const App = () => {
         <BrowserRouter>
             <Toaster position="top-center" reverseOrder={false} />
             
-            <Navbar />
+            <SmartNavbar />
            
             <SmartMain className="pt-[80px] min-h-screen">
                 <Routes>
@@ -246,14 +247,16 @@ const App = () => {
                         user?.role === 'student' ? 
                         <Navigate to="/student/dashboard" /> 
                         : <Navigate to="/educator/dashboard"/>): <Home />} />
-                    <Route path="/login"
+                     <Route path="/login"
                         element={isAuthenticated  ? (
                              user?.role === 'student' ? 
-                             <Navigate to="/student/dashboard" /> 
+                             <Navigate to="/student/dashboard" />  :
+                             user?.role === 'admin' ? <Navigate to="/admin/dashboard"/>
                         : <Navigate to="/educator/dashboard"/>): <Login />} />
-                   
-                    <Route path="/student/dashboard" element={<SDashboard />} />
-                    <Route path="/educator/dashboard" element={<EDashboard />} />
+
+
+                    <Route path="/student/dashboard" element={isAuthenticated ? <SDashboard /> : <Navigate to="/" />} />
+                    <Route path="/educator/dashboard" element={isAuthenticated ? <EDashboard /> : <Navigate to="/" />} />
                     
                     <Route path="/admin/dashboard" element={<Dashboard/>}/>
                     <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to="/" />} />
@@ -264,7 +267,10 @@ const App = () => {
                 {/* --- Course Explorer Routes --- */}
                 <Route path="/all-courses" element={<AllCourses />} />
                 <Route path="/course-detail/:courseId" element={<CourseDetail />} />
+                {/* <Route path="/course-view/:courseId" element={<CourseDetail />} /> */}
 
+
+                <Route path="/admin/dashboard" element={user?.role === 'admin' ? <Dashboard/> : <Navigate to="/login"/>}/>
                 {/* --- Student Routes (Authentication Required) --- */}
                 <Route path="/my-courses" element={isAuthenticated ? <MyEnrolledCourses /> : <Navigate to="/login" />} />
                 <Route path="/view-lectures/:courseId" element={isAuthenticated ? <ViewLectures /> : <Navigate to="/login" />} />
@@ -282,7 +288,7 @@ const App = () => {
                 <Route path="/educator/edit-lecture/:lectureId" element={user?.role === 'educator' ? <EditLecture /> : <Navigate to="/" />} />
                 <Route path="/educator/students" element={user?.role === 'educator' ? <Students /> : <Navigate to="/" />} />
             </Routes>
-        /</SmartMain>
+        </SmartMain>
           
        <SmartFooter />
     </BrowserRouter>
