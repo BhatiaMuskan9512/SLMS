@@ -1,4 +1,6 @@
+import mongoose from "mongoose";
 import User from "../models/userModel.js";
+import Course from "../models/courseModel.js";
 import uploadOnCloudinary from "../config/cloudinary.js";
 
 // --- 1. GET CURRENT LOGGED-IN USER ---
@@ -78,9 +80,11 @@ export const getAllUsers = async (req, res)=>{
     try{
         //Hum unhe count kar rahe hai jinka role student hai
         const students = await User.find({role: "student"}).populate("enrolledCourses");
+
+        console.log("First student courses:", students[0]?.enrolledCourses, null, 2);
         return res.status(200).json(
             {
-                success:true,
+                success: true,
                 count: students.length, //Frontend isi 'count' ko use karega
                 users: students
             });
@@ -152,5 +156,39 @@ export const deleteStudent = async (req, res) => {
         res.status(200).json({ success: true, message: "Student deleted successfully!" });
     } catch (error) {
         res.status(500).json({ success: false, message: error.message });
+    }
+};
+
+
+
+// --- GET SINGLE STUDENT BY ID (Admin Preview) ---
+export const getStudentById = async (req, res) => {
+    try {
+        const student = await User.findById(req.params.id)
+            .select("-password")
+            .populate({
+                path: "enrolledCourses",
+                select: "title thumbnail category lectures enrolledStudents"
+            });
+
+        if (!student) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Student not found" 
+            });
+        }
+
+        console.log("Courses count ", student.enrolledCourses.length);
+
+        return res.status(200).json({ 
+            success: true, 
+            student 
+        });
+
+    } catch (error) {
+        return res.status(500).json({ 
+            success: false, 
+            message: error.message 
+        });
     }
 };

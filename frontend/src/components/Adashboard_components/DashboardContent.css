@@ -16,8 +16,9 @@
 /* 4 Cards Grid */
 .stats-grid-container {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  width:100%;
   margin-bottom: 30px;
 }
 
@@ -27,8 +28,9 @@
   border-radius: 28px;
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  width: 100%;
 }
 
 /* Middle Layout - Both graphs side by side */
@@ -45,6 +47,14 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
+/* .stat-content{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  
+} */
+
 /* Icon Styles */
 .stat-icon { width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
 .bg-soft-blue { background: #eff6ff; }
@@ -56,8 +66,8 @@
 .text-green { color: #22c55e; }
 .text-orange { color: #f97316; }
 
-.stat-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
-.stat-value { font-size: 22px; font-weight: 800; color: #1e293b; }
+.stat-label { font-size: 15px; font-weight: 700; color: #94a3b8; text-transform: uppercase; }
+.stat-value { font-size: 22px; font-weight: 800; color: #1e293b;}
 
 /* Registration List Styles */
 .student-list-item { display: flex; align-items: center; padding: 12px 0; border-bottom: 1px solid #f8fafc; }
@@ -78,7 +88,7 @@
 /* 🌟 Donut Chart ke box ke liye ye update karein */
 .donut-card {
   background: white;        /* Box ka safed rang */
-  padding: 30px;           /* Andar ki jagah */
+  padding: 36px;           /* Andar ki jagah */
   border-radius: 28px;     /* Gol kone */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); /* Halke shadow se box ubhar jayega */
   max-width: fit-content;  /* Jitna zaroori ho utna hi bada box */
@@ -88,7 +98,7 @@
 
 /* Heading ki styling */
 .donut-card h3 {
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 800;
   color: #1e293b;
   margin-bottom: 25px;

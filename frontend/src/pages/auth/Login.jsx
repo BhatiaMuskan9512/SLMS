@@ -42,8 +42,17 @@ const Login = () => {
                 
                 // 1. Update Redux store
                 
-                if (response.data.user.role === 'student') {
+                // if (response.data.user.role === 'student') {
+                //     navigate('/student/dashboard');
+                // }
+                if (response.data.user.role === 'admin') {
+                    navigate('/admin/dashboard');
+                }
+                else if(response.data.user.role === 'student'){
                     navigate('/student/dashboard');
+                }
+                else{
+                    navigate('/educator/dashboard');
                 }
                 // window.location.href = "/student/dashboard";
                 // // 2. Role-based Redirection

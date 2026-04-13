@@ -227,7 +227,8 @@ const App = () => {
                     <Route path="/login"
                         element={isAuthenticated  ? (
                              user?.role === 'student' ? 
-                             <Navigate to="/student/dashboard" /> 
+                             <Navigate to="/student/dashboard" />  :
+                             user?.role === 'admin' ? <Navigate to="/admin/dashboard"/>
                         : <Navigate to="/educator/dashboard"/>): <Login />} />
                    
                     <Route path="/student/dashboard" element={<SDashboard />} />
@@ -243,6 +244,8 @@ const App = () => {
                     <Route path="/all-courses" element={<AllCourses />} />
                     <Route path="/course-detail/:courseId" element={<CourseDetail />} />
 
+
+                    <Route path="/admin/dashboard" element={user?.role === 'admin' ? <Dashboard/> : <Navigate to="/login"/>}/>
                     {/* --- Student Routes (Authentication Required) --- */}
                     <Route path="/my-courses" element={isAuthenticated ? <MyEnrolledCourses /> : <Navigate to="/login" />} />
                     <Route path="/view-lectures/:courseId" element={isAuthenticated ? <ViewLectures /> : <Navigate to="/login" />} />
@@ -258,8 +261,7 @@ const App = () => {
                     <Route path="/educator/edit-course/:courseId" element={user?.role === 'educator' ? <EditCourse /> : <Navigate to="/" />} />
                     <Route path="/educator/create-lecture/:courseId" element={user?.role === 'educator' ? <CreateLecture /> : <Navigate to="/" />} />
                     <Route path="/educator/edit-lecture/:lectureId" element={user?.role === 'educator' ? <EditLecture /> : <Navigate to="/" />} />
-
-                    {/* <Route path="/admin/create-course" element={user?.role === 'admin' ? <CreateCourse /> : <Navigate to="/" />} /> */}
+                
                 </Routes> 
             </main>
               

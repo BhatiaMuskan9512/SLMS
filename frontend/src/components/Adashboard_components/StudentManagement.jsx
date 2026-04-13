@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Search, Edit2, Trash2, Plus, X, LayoutGrid, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Edit2, Trash2, Plus, X, LayoutGrid, ChevronLeft, ChevronRight, Eye } from 'lucide-react';
+import StudentViewModal from './StudentViewModal';
 
 const StudentManagement = () => {
   const [students, setStudents] = useState([]);
@@ -9,6 +10,11 @@ const StudentManagement = () => {
   const [courseFilter, setCourseFilter] = useState("All Courses");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const studentsPerPage = 5; // Ek page par 5 students dikhayenge
+
+  // just changes
+  const [selectedStudentId, setSelectedStudentId] = useState(null);
   
   const [formData, setFormData] = useState({
     name: '', email: '', password: '', courseName: '' // 🌟 courseName add kiya
@@ -19,6 +25,7 @@ const StudentManagement = () => {
       // 1. Students Fetch
       const res = await axios.get("http://localhost:8000/api/user/all");
       if (res.data.success) setStudents(res.data.users);
+      console.log("Data in state: ", res.data.users);
 
       // 2. 🌟 Dynamic Courses Fetch (Count aur List dono controller se)
       const courseRes = await axios.get("http://localhost:8000/api/course/count-all");
@@ -36,12 +43,19 @@ const StudentManagement = () => {
   console.log("First student courses",students[0]?.enrolledCourses);
   // 🌟 Filter Logic
   const filteredStudents = students.filter((student) => {
-    const matchesSearch = 
+  // 1. Search Logic (Name ya Email check karein)
+  const matchesSearch = 
     student.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
     student.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCourse = courseFilter === "All Courses" || (student.enrolledCourses && student.enrolledCourses.some(c => c.title === courseFilter));
-    return matchesSearch && matchesCourse;
-  });
+
+  // 2. Dropdown Logic (Course check karein)
+  const matchesCourse = 
+    courseFilter === "All Courses" || 
+    (student.enrolledCourses && student.enrolledCourses.some(c => c.title === courseFilter));
+
+  // 3. Dono true hone chahiye
+  return matchesSearch && matchesCourse;
+});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -74,18 +88,58 @@ const StudentManagement = () => {
     }
   }
 };
+
+
+
+  // 🌟 Pagination Calculation for Students
+  const indexOfLastStudent = currentPage * studentsPerPage;
+  const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
+
+  // Ab mapping ke liye 'currentStudents' use karenge
+  const currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
+
+  // Total pages calculation
+  const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+
+  // Search badalne par page 1 par reset karna
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]); // Agar koi aur filter hai toh wo bhi yahan add karein
+
+
+
   return (
     <div className="p-5  min-h-screen">
       {/* Header Section */}
       <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-extrabold text-[#1A1A1A]">All Students List</h2>
-        <button 
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 bg-[#D4A843] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#B38D35] transition-all shadow-lg shadow-[#D4A843]/20"
-        >
-          <Plus size={20} /> Add Student
-        </button>
-      </div>
+  {/* 🌟 Sirf Heading ke liye Chota Highlight Box */}
+  <div style={{
+    backgroundColor: '#E2C275',
+    padding: '18px 30px',
+    borderRadius: '18px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+  }}>
+    <h2 style={{
+      margin: 0,
+      fontSize: '1.8rem',
+      fontWeight: '800',
+      color: '#1A1A1A',
+      fontFamily: 'Arial'
+    }}>
+      All Students List 🎓
+    </h2>
+  </div>
+
+  {/* Button waisa hi rahega jaisa aapne bheja tha */}
+  <button 
+    onClick={() => setIsModalOpen(true)}
+    className="flex items-center gap-2 bg-[#D4A843] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#B38D35] transition-all shadow-lg shadow-[#D4A843]/20"
+  >
+    <Plus size={20} /> Add Student
+  </button>
+</div>
 
       {/* Main Table Card */}
       <div className="bg-white rounded-[32px] shadow-sm border border-[#F1E9D2] p-8">
@@ -95,7 +149,8 @@ const StudentManagement = () => {
           <div className="flex gap-3">
             {/* 🌟 DYNAMIC COURSES DROPDOWN */}
             <select 
-              className="bg-[#F9F6EE] border border-[#E8E1CD] rounded-xl px-4 py-2.5 text-sm font-semibold text-[#5C5C5C] outline-none"
+              className="bg-[#F9F6EE] border border-[#E8E1CD] rounded-xl px-4 py-2.5 
+              text-sm font-black text-[#5C5C5C] outline-none"
               value={courseFilter}
               onChange={(e) => setCourseFilter(e.target.value)}
             >
@@ -151,7 +206,7 @@ const StudentManagement = () => {
             </tbody> */}
             <tbody className="divide-y divide-[#F9F6EE]">
         {filteredStudents.length > 0 ? (
-           filteredStudents.map((student, index) => (
+           currentStudents.map((student, index) => (
         <tr key={index} className="hover:bg-[#FDFBF4] transition-colors group">
          {/* 1. Name Column */}
         <td className="py-5 px-4">
@@ -171,10 +226,17 @@ const StudentManagement = () => {
         {/* 3. Action Column */}
         <td className="py-5 px-4">
           <div className="flex gap-2 justify-start pr-25">
-            <button className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white 
-            transition-all shadow-sm" title='view'
-            >
-              <Edit2 size={16} />
+              <button 
+              onClick={()=> {
+                console.log("Student ID:", student._id);
+                setSelectedStudentId(student._id)}}
+               className="p-2.5 bg-green-300 text-gray-700 rounded-xl hover:bg-green-500 transition-all shadow-sm" 
+              title="view student">
+              <Eye size={16} /> 
+              </button>
+            <button className="p-2.5 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-all shadow-md
+             shadow-blue-100" title='edit student'>
+            <Edit2 size={16} />
             </button>
             {/* <button className="p-2 bg-[#F9F6EE] text-[#A39F8E] rounded-lg hover:bg-red-500 hover:text-white transition-all">
               <Trash2 size={16} />
@@ -182,8 +244,8 @@ const StudentManagement = () => {
             {/* Delete Button - Red theme & Dynamic */}
             <button 
               onClick={() => handleDelete(student._id)} // 🌟 Dynamic Delete Function
-              className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all shadow-sm"
-              title="Delete Student"
+              className="p-2.5 bg-[#FF6B6B] text-white rounded-xl hover:bg-red-600 transition-all shadow-md shadow-red-100"
+                  title="Delete student"
             >
               <Trash2 size={16}/>
             </button>
@@ -203,16 +265,45 @@ const StudentManagement = () => {
         </div>
 
         {/* Pagination Section */}
-        <div className="mt-8 flex justify-between items-center border-t border-[#F1E9D2] pt-6">
-          <p className="text-sm font-medium text-[#A39F8E]">
-            Showing 1 to {filteredStudents.length} of {students.length} results
-          </p>
-          <div className="flex items-center gap-3">
-            <button className="p-2 border border-[#E8E1CD] rounded-lg text-[#A39F8E] hover:bg-[#F9F6EE]"><ChevronLeft size={20}/></button>
-            <button className="w-10 h-10 bg-[#D4A843] text-white rounded-lg font-bold">1</button>
-            <button className="p-2 border border-[#E8E1CD] rounded-lg text-[#A39F8E] hover:bg-[#F9F6EE]"><ChevronRight size={20}/></button>
+       {/* --- 🌟 Student Pagination Section --- */}
+      <div className="flex justify-between items-center mt-10 border-t border-gray-100 pt-8 text-gray-500 font-bold">
+        
+        <span className="text-sm uppercase tracking-wider">
+          Showing {filteredStudents.length > 0 ? indexOfFirstStudent + 1 : 0} to{" "}
+          {Math.min(indexOfLastStudent, filteredStudents.length)} of {filteredStudents.length} students
+        </span>
+
+        <div className="flex items-center gap-3">
+          {/* Previous Button */}
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={`p-2 border border-[#E8E1CD] rounded-lg transition-all ${
+              currentPage === 1 ? "opacity-30 cursor-not-allowed" : "hover:bg-[#F9F6EE] text-gray-700 border-gray-300"
+            }`}
+          >
+            <ChevronLeft size={20} />
+          </button>
+
+          {/* Current Page Number */}
+          <div className="w-10 h-10 bg-[#D4A843] text-white rounded-lg flex items-center justify-center font-bold shadow-md shadow-yellow-100">
+            {currentPage}
           </div>
+
+          {/* Next Button */}
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages || totalPages === 0}
+            className={`p-2 border border-[#E8E1CD] rounded-lg transition-all ${
+              currentPage === totalPages || totalPages === 0
+                ? "opacity-30 cursor-not-allowed"
+                : "hover:bg-[#F9F6EE] text-gray-700 border-gray-300"
+            }`}
+          >
+            <ChevronRight size={20} />
+          </button>
         </div>
+      </div>
       </div>
 
       {/* Add Student Modal */}
@@ -243,6 +334,13 @@ const StudentManagement = () => {
             </form>
           </div>
         </div>
+      )}
+      {/* ← YAHAN LIKHNA HAI, isModalOpen ke BAAD */}
+      {selectedStudentId && (
+        <StudentViewModal
+          studentId={selectedStudentId}
+          onClose={() => setSelectedStudentId(null)}
+        />
       )}
     </div>
   );

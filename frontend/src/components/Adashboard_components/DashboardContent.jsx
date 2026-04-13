@@ -4,7 +4,7 @@ import {
   Users, BookOpen, GraduationCap, FileText, Clock 
 } from 'lucide-react';
 import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell
 } from 'recharts';
 import './DashboardContent.css';
@@ -24,12 +24,12 @@ const pieData = [
 ];
 
 
-// const BarData = [
-//   { day: 'Mon', value: 4000 }, { day: 'Tue', value: 3000 },
-//   { day: 'Wed', value: 5000 }, { day: 'Thu', value: 2780 },
-//   { day: 'Fri', value: 1890 }, { day: 'Sat', value: 2390 },
-//   { day: 'Sun', value: 3490 },
-// ];
+const BarData = [
+  { day: 'Mon', value: 4000 }, { day: 'Tue', value: 3000 },
+  { day: 'Wed', value: 5000 }, { day: 'Thu', value: 2780 },
+  { day: 'Fri', value: 1890 }, { day: 'Sat', value: 2390 },
+  { day: 'Sun', value: 3490 },
+];
 
 // donut chart ke liye
 const COLORS = ['#4D8BFF', '#34D399', '#FFD700', '#FF6B6B', '#8884d8'];
@@ -40,6 +40,7 @@ const DashboardContent = () => {
   const [courseCount, setCourseCount] = useState(0);
   const [instructorCount, setInstructorCount] = useState(0);
 
+  const [allStudents, setAllStudents] = useState([]); // 🌟 Sabhi students ka data store karne ke liye
   const [dynamicPieData, setDynamicPieData] = useState([]);
   //Data fetch karein
   useEffect(()=>{
@@ -49,6 +50,7 @@ const DashboardContent = () => {
         const res = await axios.get("http://localhost:8000/api/user/all");
         if(res.data.success){
             setStudentCount(res.data.count);
+             setAllStudents(res.data.users); // 🌟 Dashboard data state mein set kiya
         }
 
         // 2. Course Count fetch
@@ -82,10 +84,54 @@ const DashboardContent = () => {
       fetchStats();
   }, []);
 
+  // 🌟 LOGIC: allStudents data ko hafte ke dino mein convert karne ke liye
+  const getWeeklyData = () => {
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const counts = { Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0 };
+
+    if (allStudents && allStudents.length > 0) {
+      allStudents.forEach(student => {
+        if (student.createdAt) {
+          const dayIndex = new Date(student.createdAt).getDay();
+          counts[days[dayIndex]] += 1;
+        }
+      });
+    }
+
+    return Object.keys(counts).map(day => ({
+      day: day,
+      value: counts[day]
+    }));
+  };
+
+  const dynamicBarData = getWeeklyData();
+
   return (
     <div className="lms-dashboard-wrapper">
       
-
+      <div className="welcome-section" 
+          style={{
+                width: '100%',
+                boxSizing: 'border-box',
+                backgroundColor: '#E2C275',
+                padding: '30px 40px',
+                borderRadius: '24px',
+                boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                border: '1px solid #f0f0f0',
+                marginBottom: '30px',
+                display: 'flex',
+                alignItems: 'center',
+         }}>
+        <h1 style={{
+               margin: 0,
+               fontSize: '2.5rem',
+               fontWeight: '800', // 'bold' se badal kar '800' kar diya taaki zyada premium lage
+               color: '#1a1a1a',
+               fontFamily: 'Arial',
+               lineHeight: '1.2'
+         }}>
+           Welcome back 👋  </h1>
+      </div>
       {/* 2. TOP 4 STATS CARDS */}
       <div className="stats-grid-container">
         <div className="lms-card-stat">
@@ -112,7 +158,7 @@ const DashboardContent = () => {
             <h2 className="stat-value">{instructorCount.toLocaleString()}</h2>
           </div>
         </div>
-
+    </div>
         {/* <div className="lms-card-stat">
           <div className="stat-icon bg-soft-orange"><FileText className="text-orange" size={24} /></div>
           <div className="stat-content">
@@ -120,7 +166,7 @@ const DashboardContent = () => {
             <h2 className="stat-value">320</h2>
           </div>
         </div> */}
-      </div>
+      
 
       
       
@@ -172,25 +218,51 @@ const DashboardContent = () => {
         </div>
 
         {/* Card 2: Weekly Activity (Bar Chart) */}
-        {/* <div className="chart-box" style={{ maxWidth: '500px'}} >
-          <div className="flex justify-between items-center mb-7">
-            <h3 className="font-bold text-gray-800">Weekly student activity</h3>
-            <select className="text-xs border-none bg-gray-50 rounded-lg p-1 text-gray-500">
-              <option>Weekly</option>
-            </select>
+        <div className="chart-box" 
+          style={{ 
+            backgroundColor: 'white', 
+            padding: '24px', 
+            borderRadius: '24px', 
+            boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+            border: '1px solid #f0f0f0',
+            flex: 1, 
+            minWidth: '400px',
+            marginTop: '20px'
+          }}>
+        
+        <div className="flex justify-between items-center mb-6">
+          <div>
+            <h3 className="font-bold text-gray-800 text-lg">Weekly Student Activity</h3>
+            <p className="text-xs text-gray-400">New registrations per day</p>
           </div>
-          <div className="h-[240px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <barChart data={BarData.length > 0 ? BarData: [{day: 'No Data', value: 0}]}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fontSize: 12, fill: '#9CA3AF'}} />
-                <YAxis hide />
-                <Tooltip cursor={{fill: 'transparent'}} />
-                <Bar dataKey="value" fill="#4D8BFF" radius={[4, 4, 0, 0]} barSize={25} />
-              </barChart>
-            </ResponsiveContainer>
-          </div>
-        </div> */}
+        </div>
+
+        <div style={{ height: '240px', width: '100%' }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={dynamicBarData}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f5f5f5" />
+              <XAxis 
+                dataKey="day" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{fontSize: 12, fill: '#9CA3AF'}} 
+                dy={10}
+              />
+              <YAxis hide />
+              <Tooltip 
+                cursor={{fill: '#F9F6EE'}} 
+                contentStyle={{borderRadius: '10px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)'}}
+              />
+              <Bar 
+                dataKey="value" 
+                fill="#D4A843" 
+                radius={[6, 6, 0, 0]} 
+                barSize={30} 
+              />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
 
       </div>
 
@@ -199,7 +271,7 @@ const DashboardContent = () => {
       <div className="dashboard-main-layout">
         
         {/* Left: Earnings Area Chart */}
-        <div className="lms-card-main chart-box">
+        {/* <div className="lms-card-main chart-box">
           <div className="card-header-box">
             <h3>Earnings Overview</h3>
             <div className="amount-highlight">$12,450 <span>this month</span></div>
@@ -221,7 +293,7 @@ const DashboardContent = () => {
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </div> */}
 
         {/* Right: Recent Registrations List */}
         <div className="lms-card-main registration-box">

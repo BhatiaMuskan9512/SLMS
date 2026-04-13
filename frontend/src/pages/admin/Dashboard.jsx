@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import Sidebar from '../../components/Adashboard_components/sidebar';
 import DashboardContent from '../../components/Adashboard_components/DashboardContent';
 import StudentManagement from '../../components/Adashboard_components/StudentManagement';
@@ -6,6 +9,8 @@ import CourseManagement from '../../components/Adashboard_components/CourseManag
 import InstructorManagement from '../../components/Adashboard_components/InstructorManagement';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -36,25 +41,12 @@ const Dashboard = () => {
                    marginTop: '10px' 
                }}>
                  
-                 {/* Welcome Text - Ab ye ekdam top-left mein rahega */}
-                 <div className="welcome-section">
-                   <h1 style={{ 
-                       margin: 0, 
-                       fontSize: '2rem', 
-                       fontWeight: 'bold', 
-                       color: '#1a1a1a',
-                       fontFamily: 'serif',
-                       lineHeight: '1.2'
-                   }}>
-                       Welcome back👋
-                   </h1>
-                   <p style={{ margin: '5px 0 0 0', color: '#888', fontSize: '0.9rem' }}>
-                       Aapka LMS platform aaj 12% zyada grow kar raha hai.
-                   </p>
-                 </div>
+                 
+                 {/* Welcome Text - Ab ye ek bada professional box ban jayega */}
+                
 
                  {/* Search & Notification - Ye top-right mein shift ho gaya */}
-                 <div className="flex items-center gap-4">
+                 {/* <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2 bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-600 min-w-[280px] shadow-sm focus-within:border-[#d4a843]">
                         <span>🔍</span>
                         <input 
@@ -70,7 +62,7 @@ const Dashboard = () => {
                         <span className="text-xl">🔔</span>
                         <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
                     </div>
-                 </div>
+                 </div> */}
                </div>
 
                {/* Dashboard Charts/Cards */}
@@ -78,6 +70,7 @@ const Dashboard = () => {
                  activeTab={activeTab} 
                  searchTerm={searchTerm} 
                  setSearchTerm={setSearchTerm} 
+                 user = {user}
                />
              </>
            ) : (

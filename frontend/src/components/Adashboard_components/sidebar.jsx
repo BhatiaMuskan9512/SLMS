@@ -45,7 +45,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
 
       {/* Bottom Section */}
       <div className="sidebar-footer">
-        <div className="account-tag">ACCOUNT</div>
+        
         
         {/* Profile Link */}
         <div 
@@ -56,11 +56,12 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
           <span className="nav-label">My Profile</span>
         </div>
 
-        
+        <div>
         <button className="logout-btn">
           <LogOut size={20} />
           <span>Logout</span>
         </button>
+        </div>
       </div>
     </div>
   );

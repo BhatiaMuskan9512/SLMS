@@ -4,6 +4,7 @@ import {
     getAllUsers,
     getCurrentUser, 
     getInstructorCount, 
+    getStudentById, 
     register, 
     updateProfile 
 } from "../controllers/userController.js";
@@ -12,6 +13,8 @@ import upload from "../middleware/multer.js";
 
 const userRouter = express.Router();
 
+
+userRouter.get('/student/:id',getStudentById);
 
 userRouter.get("/all",getAllUsers);
 

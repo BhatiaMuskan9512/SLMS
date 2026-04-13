@@ -29,7 +29,7 @@ export const createCourse = async (req, res) => {
 // 2. Get all published courses for Home Page
 export const getPublishedCourses = async (req, res) => {
     try {
-        const courses = await Course.find({ isPublished: true }).populate("lectures").populate("reviews");
+        const courses = await Course.find({ isPublished: true }).populate("lectures").populate("reviews").populate("creator","name");
 
         if (!courses) {
             return res.status(404).json({ message: "Courses not found" });
@@ -97,7 +97,8 @@ export const getCourseById = async (req, res) => {
     const { courseId } = req.params;
 
     try {
-        const course = await Course.findById(courseId).populate("lectures").populate("reviews");
+        const course = await Course.findById(courseId).populate("lectures")
+        .populate("reviews").populate("lectures").populate("creator", "name photoUrl email");
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
         }
