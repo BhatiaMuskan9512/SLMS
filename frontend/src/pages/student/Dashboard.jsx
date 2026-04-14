@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useEffect, useState } from 'react'; // it use to fetch data from background
+import { useSelector, useDispatch } from 'react-redux';  // to access global state 
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Sidebar from '../../components/Sdashboard_components/Sidebar';
