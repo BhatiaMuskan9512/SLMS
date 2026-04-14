@@ -154,7 +154,7 @@ import CoursePlayer from './pages/CoursePlayer';
 import Students from './pages/educator/Students';
 import EAssignments from './pages/educator/Assignments';
 
-import Process from './pages/process';
+
 
 axios.defaults.baseURL = "http://localhost:8000";
 axios.defaults.withCredentials=true;

@@ -13,7 +13,7 @@ const Process = () => {
     { num: "01", title: "Create your free account", text: "Sign up in 30 seconds. No credit card required. Instantly access 200+ free lessons." },
     { num: "02", title: "Get your learning path", text: "Tell us your goals. Our AI crafts a personalised curriculum just for you." },
     { num: "03", title: "Learn at your own pace", text: "Watch lessons, complete challenges, and track progress on any device, anytime." },
-    { num: "04", title: "Earn & share certificates", text: "Complete your path, earn a verified certificate, and share it with the world." },
+    // { num: "04", title: "Earn & share certificates", text: "Complete your path, earn a verified certificate, and share it with the world." },
   ];
 
   return (
@@ -72,14 +72,14 @@ const Process = () => {
             </div>
 
             {/* Certificate Alert */}
-            <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-4 hover:bg-white/10 transition-colors cursor-pointer">
+            {/* <div className="bg-white/5 border border-white/10 rounded-xl p-4 flex items-center gap-4 hover:bg-white/10 transition-colors cursor-pointer">
               <span className="text-3xl">🎓</span>
               <div>
                 <div className="text-sm font-semibold text-white/90">Certificate Earned!</div>
                 <div className="text-[11px] text-white/30 mt-1">SQL & Database Design — Level 2</div>
               </div>
               <span className="ml-auto text-[11px] text-[#d4a843] font-medium uppercase tracking-wider">View →</span>
-            </div>
+            </div> */}
           </div>
         </div>
 

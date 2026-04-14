@@ -720,15 +720,10 @@ const CourseDetailPage = () => {
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-[#D4A843]/15
+                  {/* <div className="w-10 h-10 rounded-xl bg-[#D4A843]/15
                                   flex items-center justify-center">
                     <Award size={16} className="text-[#D4A843]"/>
-                  </div>
-                  <div>
-                    <p className="text-[10px] text-gray-500 uppercase
-                                  font-black tracking-widest">Certificate</p>
-                    <p className="text-sm font-bold text-white">Yes</p>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -764,7 +759,7 @@ const CourseDetailPage = () => {
                   src={course.thumbnail ||
                     "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600"}
                   alt={course.title}
-                  className="w-full h-72 object-cover"
+                  className="w-full h-75 object-cover"
                 />
               </div>
             </div>
@@ -811,7 +806,7 @@ const CourseDetailPage = () => {
           </div>
 
           {course.lectures?.length === 0 ? (
-            <div className="bg-white rounded-[24px] p-12 text-center
+            <div className="bg-white rounded-[24px] p-15 text-center
                             border border-gray-100">
               <BookOpen size={48} className="text-gray-200 mx-auto mb-4"/>
               <p className="text-gray-400 font-bold">No lectures added yet.</p>
@@ -892,107 +887,7 @@ const CourseDetailPage = () => {
           )}
         </div>
 
-        {/* Right — Enroll Card */}
-        <div className="lg:col-span-1">
-          <div className="bg-white rounded-[28px] overflow-hidden
-                          border border-gray-100 shadow-lg sticky top-[100px]">
-
-            {/* Thumbnail */}
-            <div className="relative h-44 overflow-hidden">
-              <img
-                src={course.thumbnail ||
-                  "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=600"}
-                alt={course.title}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t
-                              from-black/70 to-transparent"/>
-              <div className="absolute bottom-4 left-4">
-                <p className="text-white/70 text-xs font-bold uppercase
-                              tracking-wider">
-                  Full Course Access
-                </p>
-                <p className="text-white text-3xl font-extrabold">
-                  {isFree ? "Free" :
-                    `₹${course.price?.toLocaleString('en-IN')}`}
-                </p>
-              </div>
-              {isFree && (
-                <span className="absolute top-3 right-3 bg-green-500
-                                 text-white text-xs font-black
-                                 px-3 py-1 rounded-full">
-                  100% Free
-                </span>
-              )}
-            </div>
-
-            <div className="p-6 space-y-4">
-
-              {/* Button */}
-              {!user ? (
-                <button
-                  onClick={showLoginToast}
-                  className="w-full bg-[#D4A843] text-[#0a0b0f] py-4
-                             rounded-[16px] font-black text-base
-                             hover:bg-[#B38D35] transition-all
-                             shadow-lg shadow-[#D4A843]/20
-                             flex items-center justify-center gap-2">
-                  🔒 Login to Enroll
-                </button>
-              ) : isEnrolled ? (
-                <button
-                  onClick={() => navigate(`/course-player/${courseId}`)}
-                  className="w-full bg-green-600 text-white py-4
-                             rounded-[16px] font-black text-base
-                             hover:bg-green-700 transition-all
-                             flex items-center justify-center gap-2
-                             shadow-lg shadow-green-200">
-                  <Play size={18}/> Continue Learning
-                </button>
-              ) : (
-                <button
-                  onClick={handleEnroll}
-                  disabled={enrolling}
-                  className="w-full bg-[#0a0b0f] text-white py-4
-                             rounded-[16px] font-black text-base
-                             hover:bg-gray-800 transition-all
-                             shadow-xl disabled:opacity-50">
-                  {enrolling ? "Enrolling..." :
-                    isFree ? "Enroll Now — It's Free!" : "Buy Now"}
-                </button>
-              )}
-
-              <p className="text-center text-xs text-gray-400 font-medium">
-                30-Day Money-Back Guarantee • Lifetime Access
-              </p>
-
-              {/* Includes */}
-              <div className="pt-4 border-t border-gray-100 space-y-3">
-                <p className="text-xs font-black text-gray-400 uppercase
-                              tracking-widest">
-                  This course includes:
-                </p>
-
-                {[
-                  { icon: BookOpen, text: `${course.lectures?.length || 0} lectures` },
-                  { icon: Clock, text: `${duration} total content` },
-                  { icon: Users, text: `${course.enrolledStudents?.length || 0} students` },
-                  { icon: Award, text: 'Certificate of completion' },
-                  ...(course.level ? [{ icon: BarChart2, text: `${course.level} level` }] : [])
-                ].map(({ icon: Icon, text }, i) => (
-                  <div key={i} className="flex items-center gap-3
-                                          text-sm text-gray-600">
-                    <div className="w-8 h-8 rounded-lg bg-[#D4A843]/10
-                                    flex items-center justify-center flex-shrink-0">
-                      <Icon size={14} className="text-[#D4A843]"/>
-                    </div>
-                    <span>{text}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
+        
             </div>
           </div>
   );

@@ -11,18 +11,18 @@ const CourseViewModal = ({ courseId, onClose }) => {
     const fetchCourse = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:8000/api/course/get-course/${courseId}`
+          `http://localhost:8000/api/course/get-course/${courseId}`,
+          { withCredentials: true }  // ← Fix 1: cookie bhejo
         );
-        console.log("Course data:", res.data);
-        setCourse(res.data);
+        setCourse(res.data.course || res.data); // ← Fix 2: sirf course object lo
       } catch (error) {
         console.error("Error fetching course:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchCourse();
-  }, [courseId]);
+    if (courseId) fetchCourse(); // safety check
+}, [courseId]);
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm 
