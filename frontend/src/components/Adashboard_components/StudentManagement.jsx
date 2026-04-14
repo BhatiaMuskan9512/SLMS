@@ -61,7 +61,7 @@ const StudentManagement = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:8000/api/user/register", { ...formData, role: 'student' });
+      const res = await axios.post("http://localhost:8000/api/user/register", { ...formData, role: 'student', isOtpVerified: true });
       if (res.data.success) {
         setIsModalOpen(false);
         fetchData();
@@ -76,7 +76,7 @@ const StudentManagement = () => {
 
   const handleDelete = async (id) => {
   // 🌟 Ye line ek popup dikhayegi OK aur Cancel buttons ke saath
-  const userConfirmed = window.confirm("Kya aap sach mein is student ko delete karna chahte hain?");
+  const userConfirmed = window.confirm("Do you really want to delete this student??");
 
   if (userConfirmed) {
     // Agar OK dabaya toh hi ye block chalega
@@ -182,28 +182,6 @@ const StudentManagement = () => {
                 <th className="pb-4 px-4 text-xs font-bold text-[#A39F8E] uppercase tracking-widest pr-25">Action</th>
               </tr>
             </thead>
-            {/* <tbody className="divide-y divide-[#F9F6EE]">
-              {filteredStudents.map((student, index) => (
-                <tr key={index} className="hover:bg-[#FDFBF4] transition-colors group">
-                  <td className="py-5 px-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-11 h-11 rounded-2xl bg-[#D4A843]/10 flex items-center justify-center font-bold text-[#D4A843]">
-                        {student.name.charAt(0)}
-                      </div>
-                      <span className="font-bold text-[#1A1A1A]">{student.name}</span>
-                    </div>
-                  </td>
-                  <td className="py-5 px-4 text-sm text-[#5C5C5C]">{student.email}</td>
-
-                  <td className="py-5 px-4 text-right">
-                    <div className="flex gap-2 justify-end">
-                      <button className="p-2 bg-[#F9F6EE] text-[#A39F8E] rounded-lg hover:bg-[#D4A843] hover:text-white transition-all"><Edit2 size={16}/></button>
-                      <button className="p-2 bg-[#F9F6EE] text-[#A39F8E] rounded-lg hover:bg-red-500 hover:text-white transition-all"><Trash2 size={16}/></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody> */}
             <tbody className="divide-y divide-[#F9F6EE]">
         {filteredStudents.length > 0 ? (
            currentStudents.map((student, index) => (

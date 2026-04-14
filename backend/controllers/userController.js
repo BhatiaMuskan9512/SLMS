@@ -175,37 +175,31 @@ export const getInstructorCount = async (req, res) => {
 };
 
 
-// Naya Student Register karne ke liye
 export const register = async (req, res) => {
-    try {
-        const { name, email, password, role } = req.body;
+  const { name, email, password, role, isOtpVerified } = req.body;
 
-        // 1. Check karein ki user pehle se toh nahi hai
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ success: false, message: "Email already registered!" });
-        }
-
-        // 2. Naya user create karein (Password hash middleware agar lagaya hai toh theek, warna direct save)
-        const newUser = new User({
-            name,
-            email,
-            password, // ideally ise hash karna chahiye bcrypt se
-            role: role || 'student',
-            enrolledCourses: [] // Shuruat mein khali rakhenge jaisa aapne kaha
-        });
-
-        await newUser.save();
-
-        res.status(201).json({
-            success: true,
-            message: "Student registered successfully!",
-            user: newUser
-        });
-
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
+  try {
+    const existUser = await User.findOne({ email });
+    if (existUser) {
+      return res.status(400).json({ success: false, message: "User already exists" });
     }
+
+    // ✅ YAHI step missing tha
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = await User.create({
+      name,
+      email,
+      password: hashedPassword,  // 🌟 Plain nahi, hashed
+      role: role || 'student',
+      isOtpVerified: isOtpVerified || true,
+    });
+
+    return res.status(201).json({ success: true, message: "Student added!" });
+
+  } catch (error) {
+    return res.status(500).json({ success: false, message: error.message });
+  }
 };
 
 // --- 3. CHANGE PASSWORD (Logged-in User) ---
@@ -406,128 +400,128 @@ export const updateInstructor = async (req, res) => {
 
 
 
-export const sendInstructorOTP = async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
+// export const sendInstructorOTP = async (req, res) => {
+//     try {
+//         const { name, email, password } = req.body;
 
         
-        // ✅ Validation add karo
-        if (!name || !email || !password) {
-            return res.status(400).json({ 
-                success: false, 
-                message: "Name, email and password are required!" 
-            });
-        }
+//         // ✅ Validation add karo
+//         if (!name || !email || !password) {
+//             return res.status(400).json({ 
+//                 success: false, 
+//                 message: "Name, email and password are required!" 
+//             });
+//         }
         
-        // ✅ Email already exist check
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(400).json({ 
-                success: false, 
-                message: "Email already registered!" 
-            });
-        }
+//         // ✅ Email already exist check
+//         const existingUser = await User.findOne({ email });
+//         if (existingUser) {
+//             return res.status(400).json({ 
+//                 success: false, 
+//                 message: "Email already registered!" 
+//             });
+//         }
 
-        // ✅ OTP generate karo
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+//         // ✅ OTP generate karo
+//         const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // ✅ Temporarily user banao (verified nahi hai abhi)
-        const hashedPassword = await bcrypt.hash(password, 10);
+//         // ✅ Temporarily user banao (verified nahi hai abhi)
+//         const hashedPassword = await bcrypt.hash(password, 10);
 
-        // Pehle check karo agar pending user hai toh update karo
-        let pendingUser = await User.findOne({ email, isOtpVerified: false });
+//         // Pehle check karo agar pending user hai toh update karo
+//         let pendingUser = await User.findOne({ email, isOtpVerified: false });
         
-        if (pendingUser) {
-            pendingUser.resetOtp = otp;
-            pendingUser.otpExpires = Date.now() + 5 * 60 * 1000;
-            pendingUser.name = name;
-            pendingUser.password = hashedPassword;
-            await pendingUser.save();
-        } else {
-            await User.create({
-                name,
-                email,
-                password: hashedPassword,
-                role: "educator",
-                resetOtp: otp,
-                otpExpires: Date.now() + 5 * 60 * 1000,
-                isOtpVerified: false
-            });
-        }
+//         if (pendingUser) {
+//             pendingUser.resetOtp = otp;
+//             pendingUser.otpExpires = Date.now() + 5 * 60 * 1000;
+//             pendingUser.name = name;
+//             pendingUser.password = hashedPassword;
+//             await pendingUser.save();
+//         } else {
+//             await User.create({
+//                 name,
+//                 email,
+//                 password: hashedPassword,
+//                 role: "educator",
+//                 resetOtp: otp,
+//                 otpExpires: Date.now() + 5 * 60 * 1000,
+//                 isOtpVerified: false
+//             });
+//         }
 
-        // ✅ Email bhejo
-        await sendMail(email, otp);
+//         // ✅ Email bhejo
+//         await sendMail(email, otp);
 
-        return res.status(200).json({
-            success: true,
-            message: "OTP sent to instructor's email!"
-        });
+//         return res.status(200).json({
+//             success: true,
+//             message: "OTP sent to instructor's email!"
+//         });
 
-    } catch (error) {
-        return res.status(500).json({ 
-            success: false, 
-            message: error.message 
-        });
-    }
-};
-
-
+//     } catch (error) {
+//         return res.status(500).json({ 
+//             success: false, 
+//             message: error.message 
+//         });
+//     }
+// };
 
 
-export const verifyInstructorOTP = async (req, res) => {
-    try {
-        const { email, otp } = req.body;
 
-        const user = await User.findOne({ email });
 
-        if (!user) {
-            return res.status(404).json({ 
-                success: false, 
-                message: "Instructor not found!" 
-            });
-        }
+// export const verifyInstructorOTP = async (req, res) => {
+//     try {
+//         const { email, otp } = req.body;
 
-        // ✅ OTP check karo
-        if (user.resetOtp !== otp) {
-            return res.status(400).json({ 
-                success: false, 
-                message: "Invalid OTP!" 
-            });
-        }
+//         const user = await User.findOne({ email });
 
-        // ✅ OTP expire check karo
-        if (user.otpExpires < Date.now()) {
-            return res.status(400).json({ 
-                success: false, 
-                message: "OTP expired! Please try again." 
-            });
-        }
+//         if (!user) {
+//             return res.status(404).json({ 
+//                 success: false, 
+//                 message: "Instructor not found!" 
+//             });
+//         }
 
-        // ✅ Verify karo
-        user.isOtpVerified = true;
-        user.resetOtp = undefined;
-        user.otpExpires = undefined;
-        await user.save();
+//         // ✅ OTP check karo
+//         if (user.resetOtp !== otp) {
+//             return res.status(400).json({ 
+//                 success: false, 
+//                 message: "Invalid OTP!" 
+//             });
+//         }
 
-        return res.status(200).json({
-            success: true,
-            message: "Instructor verified successfully!",
-            instructor: {
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-                photoUrl: user.photoUrl || "",
-                coursesCount: 0,
-                lessonsCount: 0,
-                courses: []
-            }
-        });
+//         // ✅ OTP expire check karo
+//         if (user.otpExpires < Date.now()) {
+//             return res.status(400).json({ 
+//                 success: false, 
+//                 message: "OTP expired! Please try again." 
+//             });
+//         }
 
-    } catch (error) {
-        return res.status(500).json({ 
-            success: false, 
-            message: error.message 
-        });
-    }
-};
+//         // ✅ Verify karo
+//         user.isOtpVerified = true;
+//         user.resetOtp = undefined;
+//         user.otpExpires = undefined;
+//         await user.save();
+
+//         return res.status(200).json({
+//             success: true,
+//             message: "Instructor verified successfully!",
+//             instructor: {
+//                 _id: user._id,
+//                 name: user.name,
+//                 email: user.email,
+//                 role: user.role,
+//                 photoUrl: user.photoUrl || "",
+//                 coursesCount: 0,
+//                 lessonsCount: 0,
+//                 courses: []
+//             }
+//         });
+
+//     } catch (error) {
+//         return res.status(500).json({ 
+//             success: false, 
+//             message: error.message 
+//         });
+//     }
+// };

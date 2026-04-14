@@ -16,85 +16,9 @@ const InstructorManagement = () => {
   
   const [selectedInstructorId, setSelectedInstructorId] = useState(null);
 
-  // Yeh states abhi missing hain
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [addForm, setAddForm] = useState({ name: "", email: "", password: "" });
-  const [addPhoto, setAddPhoto] = useState(null);
-  const [addPhotoPreview, setAddPhotoPreview] = useState(null);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [addForm, setAddForm] = useState({ name: '', email: '', password: '' });
   const [addLoading, setAddLoading] = useState(false);
-  const [addError, setAddError] = useState("");
-  const [otpStep, setOtpStep] = useState(false); // ✅ OTP step show karo
-  const [otpValue, setOtpValue] = useState("");
-  const [otpLoading, setOtpLoading] = useState(false);
-
-
- const handleAddInstructor = async () => {
-    setAddLoading(true);
-    setAddError("");
-
-    try {
-        // ✅ FormData use karo - JSON object nahi
-        const data = new FormData();
-        data.append("name", addForm.name);
-        data.append("email", addForm.email);
-        data.append("password", addForm.password);
-        if (addPhoto) data.append("photoUrl", addPhoto);
-
-        const res = await axios.post(
-            "http://localhost:8000/api/user/send-instructor-otp",
-            data, // ✅ JSON object ki jagah data bhejo
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    "Content-Type": "multipart/form-data" // ✅ Yeh bhi add karo
-                }
-            }
-        );
-
-        if (res.data.success) {
-            setOtpStep(true);
-        }
-    } catch (err) {
-        setAddError(err.response?.data?.message || "Failed to send OTP.");
-    } finally {
-        setAddLoading(false);
-    }
-};
-
-const handleVerifyOTP = async () => {
-    setOtpLoading(true);
-    setAddError("");
-
-    try {
-        const res = await axios.post(
-            "http://localhost:8000/api/user/verify-instructor-otp",
-            { email: addForm.email, otp: otpValue },
-            {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`
-                }
-            }
-        );
-
-        if (res.data.success) {
-            // ✅ List mein add karo
-            setInstructors(prev => [...prev, res.data.instructor]);
-            
-            // ✅ Reset sab kuch
-            setShowAddModal(false);
-            setOtpStep(false);
-            setOtpValue("");
-            setAddForm({ name: "", email: "", password: "" });
-            setAddPhoto(null);
-            setAddPhotoPreview(null);
-        }
-    } catch (err) {
-        setAddError(err.response?.data?.message || "Invalid OTP!");
-    } finally {
-        setOtpLoading(false);
-    }
-};
-
 
   // Instructor Edit button pe click
   // 1. State add karo upar
@@ -241,6 +165,30 @@ const handleDeleteInstructor = async (id) => {
 };
 
 
+const handleAddInstructor = async (e) => {
+  e.preventDefault();
+  setAddLoading(true);
+  try {
+    const res = await axios.post("http://localhost:8000/api/user/register", {
+      ...addForm,
+      role: 'educator',
+      isOtpVerified: true
+    });
+    if (res.data.success) {
+      setIsAddModalOpen(false);
+      setAddForm({ name: '', email: '', password: '' });
+      // List refresh karo
+      const updated = await axios.get("http://localhost:8000/api/user/instructors-count");
+      if (updated.data.success) setInstructors(updated.data.instructors);
+      alert("Instructor Added!");
+    }
+  } catch (error) {
+    alert(error.response?.data?.message || "Error adding instructor");
+  } finally {
+    setAddLoading(false);
+  }
+};
+
   return (
     <div className="p-0 min-h-screen">
       {/* Header Section */}
@@ -265,7 +213,7 @@ const handleDeleteInstructor = async (id) => {
             Intructors List 🎓
           </h2>
         </div>
-        <button onClick={() => setShowAddModal(true)} 
+        <button onClick={() => setIsAddModalOpen(true)}
         className="flex items-center gap-2 bg-[#D4A843] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#B38D35] transition-all shadow-lg shadow-[#D4A843]/20">
           <Plus size={20} /> Add Instructor
         </button>
@@ -513,178 +461,64 @@ const handleDeleteInstructor = async (id) => {
             </div>
           </div>
         )}
+    
+    {/* Add Instructor Modal */}
+{isAddModalOpen && (
+  <div className="fixed inset-0 bg-black/30 backdrop-blur-md flex items-center justify-center z-[1000]">
+    <div className="bg-white w-full max-w-md rounded-[40px] p-10 shadow-2xl">
+      
+      <div className="flex justify-between items-center mb-8">
+        <h3 className="text-2xl font-black text-[#1A1A1A]">New Instructor</h3>
+        <button 
+          onClick={() => setIsAddModalOpen(false)} 
+          className="bg-[#F9F6EE] p-2 rounded-full text-[#A39F8E]">
+          <X size={20}/>
+        </button>
+      </div>
 
-        {/* Add Instructor Modal */}
-{showAddModal && (
-    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm 
-                    flex items-center justify-center z-[1000] p-4">
-        
-        <div className="bg-white w-full max-w-md rounded-[32px] shadow-2xl overflow-hidden">
-            
-            {/* Header */}
-            <div className="bg-gradient-to-br from-[#D4A843] to-[#B38D35] p-6 relative">
-                <button
-                    onClick={() => { setShowAddModal(false); setOtpStep(false); setOtpValue(""); }}
-                    className="absolute top-4 right-4 bg-white/20 hover:bg-white/40 
-                               text-white p-2 rounded-full transition-all"
-                >
-                    <X size={18} />
-                </button>
-                <h2 className="text-white text-xl font-black">
-                    {otpStep ? "Verify OTP 🔐" : "Add New Instructor"}
-                </h2>
-                <p className="text-white/70 text-sm mt-1">
-                    {otpStep ? `OTP sent to ${addForm.email}` : "Fill in the details below"}
-                </p>
-            </div>
-
-            <div className="p-6 space-y-5">
-
-                {/* OTP Step */}
-                {otpStep ? (
-                    <>
-                        <p className="text-center text-gray-500 text-sm">
-                            6-digit OTP instructor ki email pe bheja gaya hai
-                        </p>
-
-                        <input
-                            type="text"
-                            maxLength="6"
-                            placeholder="0 0 0 0 0 0"
-                            value={otpValue}
-                            onChange={(e) => setOtpValue(e.target.value)}
-                            className="w-full text-center text-2xl tracking-[15px] font-bold 
-                                       py-4 bg-[#F9F6EE] border border-[#E8E1CD] rounded-xl 
-                                       outline-none focus:border-[#D4A843] transition-all"
-                        />
-
-                        {addError && (
-                            <p className="text-red-500 text-sm font-bold text-center">{addError}</p>
-                        )}
-
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => { setOtpStep(false); setOtpValue(""); }}
-                                className="flex-1 py-3 border border-[#E8E1CD] rounded-xl 
-                                           text-sm font-bold text-gray-500 hover:bg-[#F9F6EE]"
-                            >
-                                Back
-                            </button>
-                            <button
-                                onClick={handleVerifyOTP}
-                                disabled={otpLoading || otpValue.length !== 6}
-                                className="flex-1 py-3 bg-[#D4A843] text-white rounded-xl 
-                                           text-sm font-bold hover:bg-[#B38D35] transition-all
-                                           disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {otpLoading ? "Verifying..." : "Verify & Add"}
-                            </button>
-                        </div>
-                    </>
-
-                ) : (
-                    // Form Step
-                    <>
-                        {/* Photo Upload */}
-                        <div className="flex flex-col items-center gap-3">
-                            <div className="w-24 h-24 rounded-[20px] overflow-hidden bg-gray-100">
-                                {addPhotoPreview ? (
-                                    <img src={addPhotoPreview} alt="Preview" className="w-full h-full object-cover"/>
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-3xl text-gray-300">
-                                        👤
-                                    </div>
-                                )}
-                            </div>
-                            <label className="flex items-center gap-2 cursor-pointer bg-[#F9F6EE] 
-                                              border border-[#E8E1CD] px-4 py-2 rounded-xl 
-                                              text-sm font-bold text-gray-600 hover:bg-[#F0E8D0] transition-all">
-                                📷 Upload Photo
-                                <input 
-                                    type="file" accept="image/*" className="hidden"
-                                    onChange={(e) => {
-                                        const file = e.target.files[0];
-                                        if (file) {
-                                            setAddPhoto(file);
-                                            setAddPhotoPreview(URL.createObjectURL(file));
-                                        }
-                                    }}
-                                />
-                            </label>
-                        </div>
-
-                        {/* Name */}
-                        <div>
-                            <label className="text-xs font-black text-gray-500 uppercase tracking-wider mb-1 block">
-                                Full Name
-                            </label>
-                            <input
-                                type="text"
-                                value={addForm.name}
-                                onChange={(e) => setAddForm(prev => ({ ...prev, name: e.target.value }))}
-                                className="w-full px-4 py-3 bg-[#F9F6EE] border border-[#E8E1CD] 
-                                           rounded-xl text-sm outline-none focus:border-[#D4A843] transition-all"
-                                placeholder="Enter instructor name"
-                            />
-                        </div>
-
-                        {/* Email */}
-                        <div>
-                            <label className="text-xs font-black text-gray-500 uppercase tracking-wider mb-1 block">
-                                Email
-                            </label>
-                            <input
-                                type="email"
-                                value={addForm.email}
-                                onChange={(e) => setAddForm(prev => ({ ...prev, email: e.target.value }))}
-                                className="w-full px-4 py-3 bg-[#F9F6EE] border border-[#E8E1CD] 
-                                           rounded-xl text-sm outline-none focus:border-[#D4A843] transition-all"
-                                placeholder="Enter email address"
-                            />
-                        </div>
-
-                        {/* Password */}
-                        <div>
-                            <label className="text-xs font-black text-gray-500 uppercase tracking-wider mb-1 block">
-                                Password
-                            </label>
-                            <input
-                                type="password"
-                                value={addForm.password}
-                                onChange={(e) => setAddForm(prev => ({ ...prev, password: e.target.value }))}
-                                className="w-full px-4 py-3 bg-[#F9F6EE] border border-[#E8E1CD] 
-                                           rounded-xl text-sm outline-none focus:border-[#D4A843] transition-all"
-                                placeholder="Set a password"
-                            />
-                        </div>
-
-                        {addError && (
-                            <p className="text-red-500 text-sm font-bold text-center">{addError}</p>
-                        )}
-
-                        <div className="flex gap-3 pt-2">
-                            <button
-                                onClick={() => setShowAddModal(false)}
-                                className="flex-1 py-3 border border-[#E8E1CD] rounded-xl 
-                                           text-sm font-bold text-gray-500 hover:bg-[#F9F6EE]"
-                            >
-                                Cancel
-                            </button>
-                            <button
-                                onClick={handleAddInstructor}
-                                disabled={addLoading || !addForm.name || !addForm.email || !addForm.password}
-                                className="flex-1 py-3 bg-[#D4A843] text-white rounded-xl 
-                                           text-sm font-bold hover:bg-[#B38D35] transition-all
-                                           disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {addLoading ? "Sending OTP..." : "Send OTP"}
-                            </button>
-                        </div>
-                    </>
-                )}
-            </div>
+      <form onSubmit={handleAddInstructor} className="space-y-5">
+        <div className="space-y-2">
+          <label className="text-xs font-bold text-[#A39F8E] uppercase ml-1">Full Name</label>
+          <input 
+            required 
+            value={addForm.name}
+            className="w-full px-5 py-4 bg-[#F9F6EE] border-none rounded-2xl outline-none"
+            onChange={(e) => setAddForm({...addForm, name: e.target.value})}
+          />
         </div>
+
+        <div className="space-y-2">
+          <label className="text-xs font-bold text-[#A39F8E] uppercase ml-1">Email Address</label>
+          <input 
+            required 
+            type="email"
+            value={addForm.email}
+            className="w-full px-5 py-4 bg-[#F9F6EE] border-none rounded-2xl outline-none"
+            onChange={(e) => setAddForm({...addForm, email: e.target.value})}
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs font-bold text-[#A39F8E] uppercase ml-1">Password</label>
+          <input 
+            required 
+            type="password"
+            value={addForm.password}
+            className="w-full px-5 py-4 bg-[#F9F6EE] border-none rounded-2xl outline-none"
+            onChange={(e) => setAddForm({...addForm, password: e.target.value})}
+          />
+        </div>
+
+        <button 
+          type="submit" 
+          disabled={addLoading} 
+          className="w-full bg-[#D4A843] text-white py-5 rounded-[20px] font-black text-lg shadow-xl shadow-[#D4A843]/30 transition-all">
+          {addLoading ? "Adding..." : "Add to SkillLink"}
+        </button>
+      </form>
+
     </div>
+  </div>
 )}
     </div>
   );

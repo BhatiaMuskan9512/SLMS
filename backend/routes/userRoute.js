@@ -10,9 +10,7 @@ import {
     getStudentById,
     getInstructorById,
     deleteInstructor,
-    updateInstructor,
-    sendInstructorOTP,
-    verifyInstructorOTP
+    updateInstructor
 } from "../controllers/userController.js";
 import isAuth from "../middleware/isAuth.js";
 import upload from "../middleware/multer.js";
@@ -37,8 +35,8 @@ userRouter.post("/register",register);
 
 userRouter.delete("/delete-student/:id",deleteStudent);
 
-userRouter.post("/send-instructor-otp", isAuth, upload.single("photoUrl"), sendInstructorOTP);
-userRouter.post("/verify-instructor-otp", isAuth, verifyInstructorOTP);
+// userRouter.post("/send-instructor-otp", isAuth, upload.single("photoUrl"), sendInstructorOTP);
+// userRouter.post("/verify-instructor-otp", isAuth, verifyInstructorOTP);
 /**
  * Route to Get Current Logged-in User Data
  * Protected: Uses isAuth to extract userId from the token
