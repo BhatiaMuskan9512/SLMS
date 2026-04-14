@@ -61,7 +61,7 @@ try {
                 
                 {/* --- Header --- */}
                 <div className="flex flex-col items-center mb-8 text-center">
-                    <div className="w-16 h-16 bg-black text-white rounded-2xl flex items-center justify-center text-3xl mb-4 shadow-lg">
+                    <div className="w-16 h-16 bg-[#d4a843] text-white rounded-2xl flex items-center justify-center text-3xl mb-4 shadow-lg">
                         <BiUserPlus />
                     </div>
                     <h1 className="text-2xl font-bold text-gray-800">Create Account</h1>
@@ -155,7 +155,7 @@ try {
                         type="submit"
                         disabled={loading}
                         className={`w-full py-4 rounded-2xl font-bold text-white transition-all shadow-xl flex items-center justify-center gap-3 ${
-                            loading ? "bg-gray-400 cursor-not-allowed" : "bg-black hover:bg-gray-800"
+                            loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#d4a843] hover:bg-[#c49833]"
                         }`}
                     >
                         {loading ? <BiLoaderAlt className="animate-spin text-xl" /> : "Create Account"}

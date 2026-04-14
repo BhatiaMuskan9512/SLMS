@@ -18,7 +18,7 @@
 //     { id: 'students', label: 'Students', icon: <Users size={20} /> },
 //     { id: 'courses', label: 'Courses', icon: <BookOpen size={20} /> },
 //     { id: 'instructors', label: 'Instructors', icon: <UserRound size={20} /> },
-//     { id: 'assignments', label: 'Assignments', icon: <ClipboardList size={20} /> }, 
+//     // { id: 'assignments', label: 'Assignments', icon: <ClipboardList size={20} /> }, 
 //   ];
 
 //   return (
@@ -45,7 +45,7 @@
 
 //       {/* Bottom Section */}
 //       <div className="sidebar-footer">
-//         <div className="account-tag">ACCOUNT</div>
+        
         
 //         {/* Profile Link */}
 //         <div 
@@ -56,11 +56,12 @@
 //           <span className="nav-label">My Profile</span>
 //         </div>
 
-        
+//         <div>
 //         <button className="logout-btn">
 //           <LogOut size={20} />
 //           <span>Logout</span>
 //         </button>
+//         </div>
 //       </div>
 //     </div>
 //   );
@@ -68,21 +69,15 @@
 
 // export default Sidebar;
 
-
-
 import React from 'react';
 import { 
   LayoutDashboard, 
   Users, 
   BookOpen, 
   UserRound, 
-  ClipboardList, 
-  BarChart3, 
-  Settings, 
   LogOut 
 } from 'lucide-react';
 import './Sidebar.css';
-
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
   const menuItems = [
@@ -90,7 +85,6 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
     { id: 'students', label: 'Students', icon: <Users size={20} /> },
     { id: 'courses', label: 'Courses', icon: <BookOpen size={20} /> },
     { id: 'instructors', label: 'Instructors', icon: <UserRound size={20} /> },
-    // { id: 'assignments', label: 'Assignments', icon: <ClipboardList size={20} /> }, 
   ];
 
   return (
@@ -101,7 +95,7 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         <span className="logo-gold"> Link</span>
       </div>
 
-      {/* Menu Items */}
+      {/* Menu Items (Top Section) */}
       <nav className="sidebar-nav">
         {menuItems.map((item) => (
           <div
@@ -115,10 +109,8 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         ))}
       </nav>
 
-      {/* Bottom Section */}
+      {/* Bottom Section (Fixed at Bottom) */}
       <div className="sidebar-footer">
-        
-        
         {/* Profile Link */}
         <div 
           className={`nav-item ${activeTab === 'profile' ? 'active' : ''}`}
@@ -128,11 +120,12 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
           <span className="nav-label">My Profile</span>
         </div>
 
-        <div>
-        <button className="logout-btn">
-          <LogOut size={20} />
-          <span>Logout</span>
-        </button>
+        {/* Logout Button */}
+        <div className="nav-item logout-item">
+          <button className="logout-btn-inner">
+            <span className="nav-icon"><LogOut size={20} /></span>
+            <span className="nav-label">Logout</span>
+          </button>
         </div>
       </div>
     </div>

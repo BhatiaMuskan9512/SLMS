@@ -97,7 +97,8 @@ export const getCourseById = async (req, res) => {
     const { courseId } = req.params;
 
     try {
-        const course = await Course.findById(courseId).populate("lectures").populate("reviews").populate("creator", "name");
+        const course = await Course.findById(courseId).populate("lectures")
+        .populate("reviews").populate("lectures").populate("creator", "name photoUrl email");
         if (!course) {
             return res.status(404).json({ message: "Course not found" });
         }

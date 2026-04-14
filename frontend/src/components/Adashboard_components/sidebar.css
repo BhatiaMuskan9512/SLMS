@@ -1,34 +1,30 @@
 :root {
-  --sidebar-bg: #121212;      /* SkillLink Dark Black */
-  --sidebar-active: #1A1A1A;  /* Active Background */
-  --gold: #E5B95F;            /* SkillLink Premium Gold */
-  --text-muted: #888888;
+  --sidebar-bg: #0a0b0f;      /* Thoda blue-ish dark jaisa image mein hai */
+  --sidebar-active: rgba(255, 255, 255, 0.1);
+  --gold: #E5B95F;            
+  --text-muted: #94a3b8;
   --text-light: #FFFFFF;
 }
 
 .lms-sidebar {
-  width: 270px;
+  width: 260px;
   height: 100vh;
   background-color: var(--sidebar-bg);
   display: flex;
   flex-direction: column;
-  padding: 2rem 1rem;
+  padding: 1.5rem 1rem;
   position: fixed;
   left: 0;
   top: 0;
   color: var(--text-light);
-  box-shadow: 4px 0 10px rgba(0,0,0,0.3);
   z-index: 1000;
-  border-right: 1px solid rgba(255, 255, 255, 0.05); /* Halka border premium look ke liye */
 }
 
-/* Logo Styling */
 .sidebar-logo {
-  font-size: 1.8rem;
+  font-size: 1.6rem;
   font-weight: 800;
-  margin-bottom: 3rem;
+  margin-bottom: 2.5rem;
   padding-left: 1rem;
-  font-family: 'Playfair Display', serif;
 }
 
 .logo-white { color: var(--text-light); }
@@ -36,7 +32,7 @@
 
 /* Navigation Links */
 .sidebar-nav {
-  flex-grow: 1;
+  flex-grow: 1; /* Ye menu ko faila dega taaki footer niche jaye */
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
@@ -49,63 +45,57 @@
   padding: 0.8rem 1rem;
   border-radius: 12px;
   cursor: pointer;
-  color: var(--text-muted); /* Default color grey */
-  transition: all 0.3s ease;
+  color: white;
+  transition: all 0.2s ease;
   font-weight: 500;
-  text-decoration: none; /* Agar NavLink use ho raha hai toh */
 }
 
-/* Hover State */
 .nav-item:hover {
   color: var(--text-light);
   background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* --- ACTIVE STATE LOGIC (Main Change) --- */
+/* ACTIVE STATE */
 .nav-item.active {
   background-color: var(--sidebar-active);
-  color: var(--gold) !important; /* Text Gold ho jayega */
-  border-left: 3px solid var(--gold);
-  border-radius: 0 12px 12px 0; /* Left side se straight, right se round */
+  color: var(--gold) !important;
 }
 
-/* Icon color change when active */
 .nav-item.active .nav-icon {
   color: var(--gold);
 }
 
-.nav-icon {
-  display: flex;
-  align-items: center;
-  transition: color 0.3s ease;
-}
-
-/* Footer Section */
+/* Footer Section - Fixed at Bottom */
 .sidebar-footer {
-  /* border-top: 1px solid rgba(255, 255, 255, 0.1); */
-  padding-top: 1.5rem;
+  margin-top: auto; /* Push everything to bottom */
+  padding-top: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 0.2rem;
 }
 
-.logout-btn {
-  margin-top: 0.5rem;
+/* Logout Styling to match Nav Items */
+.logout-item {
+  padding: 0 !important; /* Reset padding for button wrapper */
+}
+
+.logout-btn-inner {
   display: flex;
   align-items: center;
   gap: 15px;
   padding: 0.8rem 1rem;
   background: none;
   border: none;
-  color: var(--text-muted); /* Logout ko Red rakha hai taaki clear dikhe */
+  color: white;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 500;
+  font-size: inherit;
   width: 100%;
   border-radius: 12px;
-  transition: all 0.3s;
+  transition: 0.3s;
 }
 
-.logout-btn:hover {
-  background-color: rgba(255, 255, 255, 0.05);
-  color:var(--text-light);
+.logout-btn-inner:hover {
+   background-color: rgba(255, 255, 255, 0.05);
+  color: white;
 }
