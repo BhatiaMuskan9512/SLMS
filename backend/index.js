@@ -11,6 +11,7 @@ import courseRouter from "./routes/courseRoute.js";
 import paymentRouter from "./routes/paymentRoute.js";
 import reviewRouter from "./routes/reviewRoute.js";
 import studentRouter from "./routes/studentRoute.js";
+import assignmentRoutes from "./routes/assignment.route.js";
 
 // Load environment variables
 dotenv.config();
@@ -44,6 +45,7 @@ app.use("/api/course", courseRouter);
 app.use("/api/order", paymentRouter);
 app.use("/api/review", reviewRouter);
 app.use("/api/student",studentRouter);
+app.use("/api/assignment",assignmentRoutes);
 
 // Start Server
 app.listen(PORT, () => {

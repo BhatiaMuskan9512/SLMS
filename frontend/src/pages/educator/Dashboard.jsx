@@ -163,9 +163,13 @@ const Dashboard = () => {
           <SbItem icon={<PlusCircleIcon />} label="Create Course" onClick={() => navigate('/educator/create-course')} />
 
           {/* <div className="px-[18px] py-[10px] pb-[4px] mt-[6px] text-[12px] font-medium text-white/30 uppercase tracking-widest">Students</div> */}
-          <SbItem icon={<UserIcon /> } className="text-[12px]" label="Students" onClick={() => navigate('/educator/students')} />
-          {/* <SbItem icon={<ClipboardIcon />} label="Assignments" />
-          <SbItem icon={<ChatIcon />} label="Q&A" />
+          {/* <SbItem icon={<UserIcon /> } className="text-[12px]" label="Students" onClick={() => navigate('/educator/students')} /> */}
+           <SbItem 
+            icon={<ClipboardIcon />} 
+            label="Assignments" 
+            onClick={() => navigate('/educator/assignments')} // ← ye path sahi hai?
+          />
+          {/*<SbItem icon={<ChatIcon />} label="Q&A" />
 
           <div className="px-[18px] py-[10px] pb-[4px] mt-[6px] text-[12px] font-medium text-white/30 uppercase tracking-widest">Grow</div>
           <SbItem icon={<ChartIcon />} label="Analytics" />

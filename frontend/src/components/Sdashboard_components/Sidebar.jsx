@@ -22,7 +22,7 @@ const Sidebar = ({ setView, activeView }) => {
         { type: 'item', id: 'My Courses', icon: <BiBookOpen />, label: 'My Courses', path: '/my-courses' }, 
         { type: 'item', id: 'Explore', icon: <BiCompass />, label: 'Explore Catalog', path: '/all-courses' },
         { type: 'item', id: 'Progress', icon: <BiStats />, label: 'Progress Reports', path: '/student/progress' }, 
-        
+         { type: 'item', id: 'Assignments', icon: <BiBookOpen />, label: 'Assignments', path: '/student/assignments' },
         // { type: 'section', label: 'ACCOUNT' },
         { type: 'spacer' },
         { type: 'item', id: 'Profile', icon: <BiUserCircle />, label: 'My Profile', path: '/my-profile' },
@@ -60,7 +60,11 @@ const Sidebar = ({ setView, activeView }) => {
         setView("progress");
         return; // 🌟 STOP
     }
-
+    if (item.id === 'Assignments') {
+    navigate('/student/assignments');
+    return;
+    }
+    
     // 3. Agar upar mein se koi nahi hai, tabhi navigate karein (Explore, Profile, etc.)
     if (item.path) {
         navigate(item.path);

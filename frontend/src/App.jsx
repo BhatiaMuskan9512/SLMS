@@ -139,6 +139,7 @@ import MyEnrolledCourses from './pages/MyEnrolledCourses';
 import ViewLectures from './pages/ViewLectures';
 import Profile from './pages/Profilepage';
 import EditProfile from './pages/EditProfile';
+import SAssignments from './pages/student/Assignments';
 
 // --- Educator Management Pages (Private) ---
 import Courses from './pages/educator/Courses'; 
@@ -151,6 +152,7 @@ import EDashboard from './pages/educator/Dashboard';
 import SDashboard from './pages/student/Dashboard';
 import CoursePlayer from './pages/CoursePlayer';
 import Students from './pages/educator/Students';
+import EAssignments from './pages/educator/Assignments';
 
 import Process from './pages/process';
 
@@ -280,6 +282,7 @@ const App = () => {
                 <Route path="/my-profile" element={isAuthenticated ? <Profile /> : <Navigate to="/login" />} />
                 <Route path="/edit-profile" element={isAuthenticated ? <EditProfile /> : <Navigate to="/login" />} />
                 <Route path="/student/progress" element={isAuthenticated ? <div className="p-10 ml-[280px]">Progress Page Coming Soon</div> : <Navigate to="/login" />} />
+                <Route path="/student/assignments" element={isAuthenticated ? <SAssignments /> : <Navigate to="/login" />} />
                 <Route path="/student/settings" element={isAuthenticated ? <div className="p-10 ml-[280px]">Settings Page Coming Soon</div> : <Navigate to="/login" />} />
 
                 {/* --- Educator Management Routes --- */}
@@ -289,6 +292,7 @@ const App = () => {
                 <Route path="/educator/create-lecture/:courseId" element={user?.role === 'educator' || user?.role === 'admin' ? <CreateLecture /> : <Navigate to="/" />} />
                 <Route path="/educator/edit-lecture/:lectureId" element={user?.role === 'educator' || user?.role === 'admin' ? <EditLecture /> : <Navigate to="/" />} />
                 <Route path="/educator/students" element={user?.role === 'educator' ? <Students /> : <Navigate to="/" />} />
+                <Route path="/educator/assignments" element={user?.role === 'educator' ? <EAssignments /> : <Navigate to="/" />} />
             </Routes>
         </SmartMain>
           
